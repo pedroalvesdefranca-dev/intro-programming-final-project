@@ -45,7 +45,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                         return self.TelaTutorial()
                 if event.type == pygame.QUIT:
                         pygame.quit()
