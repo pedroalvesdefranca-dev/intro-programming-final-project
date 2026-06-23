@@ -51,7 +51,7 @@ class Game:
             self.screen.blit(self.msg, (150, 500))
             pygame.display.update()
 
-            self.clock.tick(60)
+            self.clock.tick(20)
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:

@@ -52,39 +52,28 @@ class Player(Entidade):
         self.coracao_cheio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_cheia.png'), (64, 64))
         self.coracao_vazio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_vazia.png'), (64, 64))
         
-        #carregango o spritesheet
-        self.sprite_totals= pygame.image.load("Assets/Personagem/sprite_1.png").convert_alpha()
-        self.sprite_dash= pygame.image.load("Assets/Personagem/sprite_3.png").convert_alpha()
         
-        self.idle = []
-        for i in range(1,2):
-            imagem=self.sprite_totals.subsurface((200*i,750),(200,250))
-            imagem=pygame.transform.scale(imagem,(80,80))
-            self.idle.append(imagem)
-
-        self.andando = []
-        for i in range(4):
-            imagem=self.sprite_totals.subsurface((200*i,0),(200,250))
-            imagem=pygame.transform.scale(imagem,(80,80))
-            self.andando.append(imagem)
-
-        self.pulando = []
-        for i in range(4,6):
-            imagem=self.sprite_totals.subsurface((200*i,0),(200,250))
-            imagem=pygame.transform.scale(imagem,(80,80))
-            self.pulando.append(imagem)
-
-        self.puloduplo =[]
-        for i in range(5,7):
-            imagem=self.sprite_totals.subsurface((200*i,0),(200,250))
-            imagem=pygame.transform.scale(imagem,(80,80))
-            self.puloduplo.append(imagem)
+        self.idle = [pygame.transform.scale(pygame.image.load("Assets/Personagem/parado.png"), (80, 80))]
         
-        self.dash = []
-        for i in range(4):
-            imagem=self.sprite_dash.subsurface((384*i,0),(384,338))
-            imagem=pygame.transform.scale(imagem,(80,80))
-            self.dash.append(imagem)
+        self.andando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_0.png"), (80, 80)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_1.png"), (80, 80)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_2.png"), (80, 80)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_3.png"), (80, 80))]
+       
+        self.pulando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_0.png"), (80, 80)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_1.png"), (80, 80))]
+       
+
+        self.puloduplo =[pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_0.png"), (80, 80)),
+                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_1.png"), (80, 80)),
+                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_3.png"), (80, 80)),
+                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_2.png"), (80, 80))]
+       
+        self.dash = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_0.png"), (80, 80)),
+                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_1.png"), (80, 80)),
+                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_2.png"), (80, 80)),
+                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_3.png"), (80, 80))]
+        
 
         self.animacao = self.idle
         self.state = 'idle'
@@ -223,6 +212,9 @@ class Player(Entidade):
             self.screen.blit(self.coracao_vazio, (75, 15))
 
     def desenhar(self):
+        
+        if self.contagem_frames >= len(self.animacao):
+            self.contagem_frames = 0
 
         frame = self.animacao[int(self.contagem_frames)]
 
