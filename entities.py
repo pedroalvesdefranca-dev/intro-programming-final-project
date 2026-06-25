@@ -47,40 +47,40 @@ class Player(Entidade):
 
         self.contagem_frames = 0
 
-        self.som_dano = pygame.mixer.Sound('Assets/Sons/tomou_dano.wav')
+        self.som_dano = pygame.mixer.Sound('Jogo-IP-Grupo-4/Assets/Sons/tomou_dano.wav')
 
-        self.coracao_cheio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_cheia.png'), (64, 64))
-        self.coracao_vazio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_vazia.png'), (64, 64))
+        self.coracao_cheio = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/vida_cheia.png'), (64, 64))
+        self.coracao_vazio = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/vida_vazia.png'), (64, 64))
 
         self.idle = [
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/idle_00.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/idle_01.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/idle_02.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/idle_03.png').convert_alpha(), (80, 80))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/idle_00.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/idle_01.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/idle_02.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/idle_03.png').convert_alpha(), (80, 80))
         ]
 
         self.andando = [
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_01.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_00.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_02.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_03.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_04.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/andando_05.png').convert_alpha(), (80, 80))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_01.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_00.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_02.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_03.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_04.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/andando_05.png').convert_alpha(), (80, 80))
         ]
 
         self.pulando = [
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/pulando_00.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/pulando_01.png').convert_alpha(), (80, 80))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/pulando_00.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/pulando_01.png').convert_alpha(), (80, 80))
         ]
 
         self.puloduplo = [
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/puloduplo_00.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/puloduplo_01.png').convert_alpha(), (80, 80)),
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/puloduplo_02.png').convert_alpha(), (80, 80))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/puloduplo_00.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/puloduplo_01.png').convert_alpha(), (80, 80)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/puloduplo_02.png').convert_alpha(), (80, 80))
         ]
 
         self.dash = [
-            pygame.transform.scale(pygame.image.load('Assets/Personagem/dash_00.png').convert_alpha(), (120, 120))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/dash_00.png').convert_alpha(), (120, 120))
         ]
 
         self.animacao = self.idle
@@ -242,17 +242,17 @@ class Moeda(Entidade):
         super().__init__(pos)
         self.screen = screen
 
-        self.som_moeda = pygame.mixer.Sound('Assets/Sons/som_moeda.wav')
+        self.som_moeda = pygame.mixer.Sound('Jogo-IP-Grupo-4/Assets/Sons/som_moeda.wav')
 
         self.colisao = pygame.Rect(pos[0], pos[1], 25, 25)
 
         self.animacao = [
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_00.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_01.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_02.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_03.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_04.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_05.png').convert_alpha(), (64, 64))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_00.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_01.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_02.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_03.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_04.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_05.png').convert_alpha(), (64, 64))
         ]
 
         self.contagem_frames = 0
@@ -277,5 +277,5 @@ class Espinho(Entidade):
         self.colisao = pygame.Rect(pos[0], pos[1] - 32, 30, 30)
 
     def desenhar(self):
-        self.imagem = pygame.image.load('Assets/Ambiente/espinho.png')
+        self.imagem = pygame.image.load('Jogo-IP-Grupo-4/Assets/Ambiente/espinho.png')
         self.screen.blit(self.imagem, (self.pos[0], self.pos[1] - 32))
