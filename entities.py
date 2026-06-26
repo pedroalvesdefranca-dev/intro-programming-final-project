@@ -27,7 +27,7 @@ class Player(Entidade):
         self.hitbox_atq = None
 
         self.state = 'idle'
-        self.state_antes = 'idle'
+        self.state_antes = None
         self.state_antes_dash = 'idle'
         self.cooldown_dash = 0
 
@@ -47,36 +47,39 @@ class Player(Entidade):
 
         self.contagem_frames = 0
 
-        self.som_dano = pygame.mixer.Sound('Assets/Sons/tomou_dano.wav')
+        self.som_dano = pygame.mixer.Sound('Jogo-IP-Grupo-4/Assets/Sons/tomou_dano.wav')
 
-        self.coracao_cheio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_cheia.png'), (64, 64))
-        self.coracao_vazio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_vazia.png'), (64, 64))
+        self.coracao_cheio = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/vida_cheia.png'), (64, 64))
+        self.coracao_vazio = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Personagem/vida_vazia.png'), (64, 64))
         
         #todos o sprites a seguir contem a imagem de umberto
         #cada frame pode ser verificado na pasta assents onde lá estão cada imagem 
         #o nome das imagens já descrevem a ação que elas fazem parte
-        self.idle = [pygame.transform.scale(pygame.image.load("Assets/Personagem/parado.png"), (80, 80))]
+        self.idle = [pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/parado.png"), (50, 90))]
         
-        self.andando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_0.png"), (80, 80)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_1.png"), (80, 80)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_2.png"), (80, 80)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_3.png"), (80, 80))]
-       
-        self.pulando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_0.png"), (80, 80)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_1.png"), (80, 80))]
-       
+        self.andando = [pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_andando_0.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_andando_1.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_andando_2.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_andando_3.png"), (100, 100))]
 
-        self.puloduplo =[pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_0.png"), (80, 80)),
-                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_1.png"), (80, 80)),
-                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_3.png"), (80, 80)),
-                         pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_2.png"), (80, 80))]
-       
-        self.dash = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_0.png"), (80, 80)),
-                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_1.png"), (80, 80)),
-                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_2.png"), (80, 80)),
-                     pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_3.png"), (80, 80))]
+        self.pulando = [pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulando_0.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulando_1.png"), (100, 100))]
+
+
+        self.puloduplo =[pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulo_duplo_0.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulo_duplo_1.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulo_duplo_3.png"), (100, 100)),
+                        pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_pulo_duplo_2.png"), (100, 100))]
+
+        self.dash = [pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_dash_0.png"), (100, 100)),
+                    pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_dash_1.png"), (100, 100)),
+                    pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_dash_2.png"), (100, 100)),
+                    pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/sprite_dash_3.png"), (100, 100))]
         
-
+        self.ataque = [
+            pygame.transform.scale(pygame.image.load("Jogo-IP-Grupo-4/Assets/Personagem/atacando.png"), (100, 100))
+        ]
+        
         self.animacao = self.idle
         self.state = 'idle'
 
@@ -105,23 +108,30 @@ class Player(Entidade):
 
     def atualizar_animacao(self):
 
-        state_antes = self.state
+        if self.cooldown_atq > 0:
+            self.state = 'atacando'
+        else:
+            if self.state != 'atacando':
+                self.state_antes = self.state
+            self.state = self.state_antes
 
         #Atualizando os estados para mudar a animação
-        if self.vel_y != 0 and self.state != 'pulo duplo' and self.state != 'dash':
+        if self.vel_y != 0 and self.state != 'pulo duplo' and self.state != 'dash' and self.state != 'atacando':
             self.state = 'pulando'
-        elif self.vel_x != 0 and self.vel_y == 0 and self.state != 'dash':
+        elif self.vel_x != 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando':
             self.state = 'andando'
-        elif self.vel_x == 0 and self.vel_y == 0 and self.state != 'dash':
+        elif self.vel_x == 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando':
             self.state = 'idle'
 
-        if self.state != state_antes:
+        if self.state != self.state_antes:
             self.contagem_frames = 0
 
         if self.no_chao and self.state == 'pulando' and self.vel_y == 0:
             self.state = 'idle'
 
-        if self.state == 'dash':
+        if self.state == 'atacando':
+            self.animacao = self.ataque
+        elif self.state == 'dash':
             self.animacao = self.dash
         elif self.state == 'andando':
             self.animacao = self.andando
@@ -142,39 +152,40 @@ class Player(Entidade):
 
     def movimento(self):
 
+        if self.cooldown_dash > 0:
+            self.cooldown_dash -= 1
+
         self.y_anterior = self.pos[1]
 
         self.vel_x = 0
 
-        if self.cooldown_dash > 0:
-            self.cooldown_dash -= 1
+        if self.state != 'atacando':
+            teclas = pygame.key.get_pressed()
+            if teclas[pygame.K_a]:
+                self.vel_x = -cst.VEL_PERSONAGEM
+                self.andando_direita = False
+            elif teclas[pygame.K_d]:
+                self.vel_x = cst.VEL_PERSONAGEM
+                self.andando_direita = True
+            if self.pulo > 0:
+                self.pulo -= 1
 
-        teclas = pygame.key.get_pressed()
-        if teclas[pygame.K_a]:
-            self.vel_x = -cst.VEL_PERSONAGEM
-            self.andando_direita = False
-        elif teclas[pygame.K_d]:
-            self.vel_x = cst.VEL_PERSONAGEM
-            self.andando_direita = True
-        if self.pulo > 0:
-            self.pulo -= 1
+            if self.pulo > 0 and self.no_chao:
+                self.vel_y = cst.PULO
 
-        if self.pulo > 0 and self.no_chao:
-            self.vel_y = cst.PULO
+            elif self.pulo > 0 and self.pulo_duplo and self.vel_y >= 0:
+                self.vel_y = cst.PULO
+                self.pulo_duplo = False
 
-        elif self.pulo > 0 and self.pulo_duplo and self.vel_y >= 0:
-            self.vel_y = cst.PULO
-            self.pulo_duplo = False
-
-        if self.time_dash > 0:
-            self.time_dash -= 1
-            self.vel_y = 0
-            if self.andando_direita:
-                self.vel_x = cst.VELDASH
-            elif not self.andando_direita:
-                self.vel_x = -cst.VELDASH
-            if self.time_dash == 0:
-                self.state = self.state_antes_dash
+            if self.time_dash > 0:
+                self.time_dash -= 1
+                self.vel_y = 0
+                if self.andando_direita:
+                    self.vel_x = cst.VELDASH
+                elif not self.andando_direita:
+                    self.vel_x = -cst.VELDASH
+                if self.time_dash == 0:
+                    self.state = self.state_antes_dash
 
         self.pos[0] += self.vel_x
 
@@ -189,10 +200,10 @@ class Player(Entidade):
 
     def atacar(self):
         if self.andando_direita:
-            self.hitbox_atq = pygame.Rect(self.pos[0] + 140, self.pos[1], 50, 128)
+            self.hitbox_atq = pygame.Rect(self.pos[0] + 40, self.pos[1], 50, 64)
             pygame.draw.rect(self.screen, cst.AMARELO, self.hitbox_atq)
         else:
-            self.hitbox_atq = pygame.Rect(self.pos[0] - 50, self.pos[1], 50, 128)
+            self.hitbox_atq = pygame.Rect(self.pos[0] - 35, self.pos[1], 50, 64)
             pygame.draw.rect(self.screen, cst.AMARELO, self.hitbox_atq)
 
     def atualizar_vida(self):
@@ -242,17 +253,17 @@ class Moeda(Entidade):
         super().__init__(pos)
         self.screen = screen
 
-        self.som_moeda = pygame.mixer.Sound('Assets/Sons/som_moeda.wav')
+        self.som_moeda = pygame.mixer.Sound('Jogo-IP-Grupo-4/Assets/Sons/som_moeda.wav')
 
         self.colisao = pygame.Rect(pos[0], pos[1], 25, 25)
 
         self.animacao = [
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_00.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_01.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_02.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_03.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_04.png').convert_alpha(), (64, 64)),
-            pygame.transform.scale(pygame.image.load('Assets/Coletáveis/moeda_05.png').convert_alpha(), (64, 64))
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_00.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_01.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_02.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_03.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_04.png').convert_alpha(), (64, 64)),
+            pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Coletáveis/moeda_05.png').convert_alpha(), (64, 64))
         ]
 
         self.contagem_frames = 0
@@ -277,5 +288,5 @@ class Espinho(Entidade):
         self.colisao = pygame.Rect(pos[0], pos[1] - 32, 30, 30)
 
     def desenhar(self):
-        self.imagem = pygame.image.load('Assets/Ambiente/espinho.png')
+        self.imagem = pygame.image.load('Jogo-IP-Grupo-4/Assets/Ambiente/espinho.png')
         self.screen.blit(self.imagem, (self.pos[0], self.pos[1] - 32))

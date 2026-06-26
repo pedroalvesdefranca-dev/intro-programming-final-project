@@ -25,7 +25,7 @@ class Game:
 
         #DEFINE VARIÁVEIS INICIAIS
         self.tela_anterior = None
-        self.tela_atual = 'menu inicial'
+        self.tela_atual = None
         self.estado = 'jogando'
 
         #DEFINE UMA FONTE
@@ -33,16 +33,16 @@ class Game:
 
         #DEFINE UM CHÃO
         self.plataformas = [
-            pygame.Rect(0, 800, 1800, 160)
+            pygame.Rect(0, 700, 1800, 160)
         ]
 
-        self.msg = pygame.transform.scale(pygame.image.load('Assets/mensagem_inicial.png'), (1500, 512))
+        self.msg = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/mensagem_inicial.png'), (1500, 512))
 
-        self.tela_menu = pygame.transform.scale(pygame.image.load('Assets/Tela inicial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+        self.tela_menu = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Tela inicial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
-        self.tela_tutorial = pygame.transform.scale(pygame.image.load('Assets/Tela tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+        self.tela_tutorial = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/Tela tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
-        self.chao = pygame.transform.scale(pygame.image.load('Assets/chao.png'), (cst.SCREEN_WIDTH, 200))
+        self.chao = pygame.transform.scale(pygame.image.load('Jogo-IP-Grupo-4/Assets/chao.png'), (cst.SCREEN_WIDTH, 200))
 
     def MenuInicial(self):
 
@@ -63,9 +63,13 @@ class Game:
 
     def TelaTutorial(self):
 
+        transicao_1_2 = pygame.Rect(1290, 500, 20, 200)
+
         player = Player((100, 600), self.screen, 3)
 
         while True:
+
+            self.tela_atual == 'Tela Tutorial'
 
             #Ordem de ações para fazer as telas:
             #1: Desenhar o cenário e o chão (se tiver plataformas é só botar la na lista do self.plataformas pra adicionar as colisões delas) e quando forem checar a
@@ -85,7 +89,8 @@ class Game:
             self.screen.fill((0, 0, 0))
 
             self.screen.blit(self.tela_tutorial, (0, 0))
-            self.screen.blit(self.chao, (0, 800))
+            pygame.draw.rect(self.screen, cst.AMARELO ,transicao_1_2)
+            self.screen.blit(self.chao, (0, 710))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
