@@ -1,5 +1,6 @@
-SCREEN_WIDTH = 1800
-SCREEN_HEIGHT = 960
+#eu modifiquei os tamanhos para poder vizualizar melhor no meu monitor
+SCREEN_WIDTH = 1300
+SCREEN_HEIGHT = 800
 
 VEL_INIMIGO = 3
 VEL_PERSONAGEM = 6
@@ -8,7 +9,7 @@ TEMPODASH = 15
 COOLDOWN_DASH = 100
 VELDASH = 15
 
-COOLDOWN_ATQ = 30
+COOLDOWN_ATQ = 35
 
 INVULNERAVEL = 100
 
