@@ -40,7 +40,7 @@ class Game:
         self.tela_menu = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-menu.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
         #IMAGEM DO TUTORIAL
-        self.tela_tutorial = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+        self.tela_tutorial = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-Tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
         #IMAGEM DO CHÃO
         self.chao = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao.png'), (cst.SCREEN_WIDTH, 200))
@@ -82,111 +82,103 @@ class Game:
         transicao_1_2 = pygame.Rect(1150, 600, 50, 200)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 600), self.screen, 3)
+        player = Player((100, 510), self.screen, 3)
 
         while True:
 
-           #OBJETO DE COLISÃO PARA A PRÓXIMA FASE
-            transicao_1_2 = pygame.Rect(1150, 600, 50, 200)
+            #DEFINE A TELA ATUAL
+            self.tela_atual == 'Tela Tutorial'
 
-            #DEFINE O OBJETO DO PLAYER
-            player = Player((100, 600), self.screen, 3)
+            #DESENHA NA TELA O CENÁRIO
+            self.screen.blit(self.tela_tutorial, (0, 0))
 
-            while True:
+            #DESENHA O OBJETO DE COLISÃO
+            pygame.draw.rect(self.screen, cst.AMARELO, transicao_1_2)
 
-                #DEFINE A TELA ATUAL
-                self.tela_atual == 'Tela Tutorial'
+            #DESENHA O CHÃO
+            self.screen.blit(self.chao, (0, 710))
 
-                #DESENHA NA TELA O CENÁRIO
-                self.screen.blit(self.tela_tutorial, (0, 0))
+            #VERIFICA EVENTOS
+            for event in pygame.event.get():
 
-                #DESENHA O OBJETO DE COLISÃO
-                pygame.draw.rect(self.screen, cst.AMARELO, transicao_1_2)
+                #EVENTO DE SAÍDA
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-                #DESENHA O CHÃO
-                self.screen.blit(self.chao, (0, 710))
+                #JOGADOR MORREU
+                if self.estado == 'Game over':
+                        
+                        if event.type == pygame.KEYDOWN:
 
-                #VERIFICA EVENTOS
-                for event in pygame.event.get():
+                            #REINICIA O JOGO
+                            if event.key == pygame.K_r:
+                                self.reiniciar(player)
 
-                    #EVENTO DE SAÍDA
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+                            #ENCERRA O JOGO
+                            if event.key == pygame.K_q:
+                                pygame.quit()
+                                sys.exit()
 
-                    #JOGADOR MORREU
-                    if self.estado == 'Game over':
-                            
-                            if event.type == pygame.KEYDOWN:
+                #JOGADOR VIVO
+                elif self.estado == 'jogando':
 
-                                #REINICIA O JOGO
-                                if event.key == pygame.K_r:
-                                    self.reiniciar(player)
+                    #COLISÃO COM A CATRACA PARA O PRÓXIMO ESTÁDO
+                    if (player.colisao.colliderect(transicao_1_2)):
 
-                                #ENCERRA O JOGO
-                                if event.key == pygame.K_q:
-                                    pygame.quit()
-                                    sys.exit()
+                        if (event.type == pygame.KEYDOWN):
+                            if (event.key == pygame.K_c):
+                                return self.CorredorInfinito()
 
-                    #JOGADOR VIVO
-                    elif self.estado == 'jogando':
+                    player.processar_evento(event)
 
-                        #COLISÃO COM A CATRACA PARA O PRÓXIMO ESTÁDO
-                        if (player.colisao.colliderect(transicao_1_2)):
+            #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
+            if self.estado == 'jogando':
+                player.atualizar_animacao()
+                player.movimento()
 
-                            if (event.type == pygame.KEYDOWN):
-                                if (event.key == pygame.K_c):
-                                    return self.CorredorInfinito()
+            #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
+            if player.invulnerabilidade > 0:
+                player.invulnerabilidade -= 1
 
-                        player.processar_evento(event)
+            player.no_chao = False
 
-                #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
-                if self.estado == 'jogando':
-                    player.atualizar_animacao()
-                    player.movimento()
+            #DESENHA A VIDA NA TELA
+            player.atualizar_vida()
 
-                #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
-                if player.invulnerabilidade > 0:
-                    player.invulnerabilidade -= 1
+            #CONTADOR PARA NÃO TER ATAQUE INFINITO
+            if player.cooldown_atq > 0:
+                player.cooldown_atq -= 1
 
-                player.no_chao = False
+            #VERIFICA A COLISÃO DO PERSONAGEM
+            for plataforma in self.plataformas:
+                pe_anterior = player.y_anterior + player.colisao.height
+                pe_atual = player.colisao.bottom
 
-                #DESENHA A VIDA NA TELA
-                player.atualizar_vida()
+                #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
+                if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
+                    player.vel_y = 0
+                    player.pos[1] = plataforma.top - player.colisao.height
+                    player.colisao.y = player.pos[1]
+                    player.no_chao = True
+                    player.pulo_duplo = True
+                    break
+            
+            #DESENHA O JOGADOR
+            if self.estado == 'jogando':
+                player.desenhar()
 
-                #CONTADOR PARA NÃO TER ATAQUE INFINITO
-                if player.cooldown_atq > 0:
-                    player.cooldown_atq -= 1
+            #VERIFICA SE O JOGADOR MORREU
+            if player.vida <= 0:
+                self.estado = 'Game over'
+                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
+                self.screen.blit(texto, (400, 300))
 
-                #VERIFICA A COLISÃO DO PERSONAGEM
-                for plataforma in self.plataformas:
-                    pe_anterior = player.y_anterior + player.colisao.height
-                    pe_atual = player.colisao.bottom
+            #ATUALIZA A TELA
+            pygame.display.update()
 
-                    #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
-                    if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
-                        player.vel_y = 0
-                        player.pos[1] = plataforma.top - player.colisao.height
-                        player.colisao.y = player.pos[1]
-                        player.no_chao = True
-                        player.pulo_duplo = True
-                        break
-                
-                #DESENHA O JOGADOR
-                if self.estado == 'jogando':
-                    player.desenhar()
-
-                #VERIFICA SE O JOGADOR MORREU
-                if player.vida <= 0:
-                    self.estado = 'Game over'
-                    texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                    self.screen.blit(texto, (400, 300))
-
-                #ATUALIZA A TELA
-                pygame.display.update()
-
-                #TICK NO RELÓGIO
-                self.clock.tick(60)
+            #TICK NO RELÓGIO
+            self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
     def CorredorInfinito(self):
@@ -195,111 +187,106 @@ class Game:
         transicao_1_2 = pygame.Rect(1150, 600, 50, 200)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 600), self.screen, 3)
+        player = Player((100, 510), self.screen, 3)
+
 
         while True:
 
-           #OBJETO DE COLISÃO PARA A PRÓXIMA FASE
-            transicao_1_2 = pygame.Rect(1150, 600, 50, 200)
+            #DEFINE A TELA ATUAL
+            self.tela_atual == 'Tela Tutorial'
 
-            #DEFINE O OBJETO DO PLAYER
-            player = Player((100, 600), self.screen, 3)
+            #DESENHA NA TELA O CENÁRIO
+            self.screen.blit(self.tela_tutorial, (0, 0))
 
-            while True:
+            #DESENHA O OBJETO DE COLISÃO
+            pygame.draw.rect(self.screen, cst.AMARELO, transicao_1_2)
 
-                #DEFINE A TELA ATUAL
-                self.tela_atual == 'Tela Tutorial'
+            #DESENHA O CHÃO
+            self.screen.blit(self.chao, (0, 710))
 
-                #DESENHA NA TELA O CENÁRIO
-                self.screen.blit(self.tela_tutorial, (0, 0))
+            #VERIFICA EVENTOS
+            for event in pygame.event.get():
 
-                #DESENHA O OBJETO DE COLISÃO
-                pygame.draw.rect(self.screen, cst.AMARELO, transicao_1_2)
+                #EVENTO DE SAÍDA
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-                #DESENHA O CHÃO
-                self.screen.blit(self.chao, (0, 710))
+                #JOGADOR MORREU
+                if self.estado == 'Game over':
+                        
+                        if event.type == pygame.KEYDOWN:
 
-                #VERIFICA EVENTOS
-                for event in pygame.event.get():
+                            #REINICIA O JOGO
+                            if event.key == pygame.K_r:
+                                self.reiniciar(player)
 
-                    #EVENTO DE SAÍDA
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
+                            #ENCERRA O JOGO
+                            if event.key == pygame.K_q:
+                                pygame.quit()
+                                sys.exit()
 
-                    #JOGADOR MORREU
-                    if self.estado == 'Game over':
-                            
-                            if event.type == pygame.KEYDOWN:
+                #JOGADOR VIVO
+                elif self.estado == 'jogando':
 
-                                #REINICIA O JOGO
-                                if event.key == pygame.K_r:
-                                    self.reiniciar(player)
+                    #COLISÃO COM A CATRACA PARA O PRÓXIMO ESTÁDO
+                    if (player.colisao.colliderect(transicao_1_2)):
 
-                                #ENCERRA O JOGO
-                                if event.key == pygame.K_q:
-                                    pygame.quit()
-                                    sys.exit()
+                        if (event.type == pygame.KEYDOWN):
+                            if (event.key == pygame.K_c):
+                                return self.CorredorInfinito()
 
-                    #JOGADOR VIVO
-                    elif self.estado == 'jogando':
+                    player.processar_evento(event)
 
-                        #COLISÃO COM A CATRACA PARA O PRÓXIMO ESTÁDO
-                        if (player.colisao.colliderect(transicao_1_2)):
+            #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
+            if self.estado == 'jogando':
+                player.atualizar_animacao()
+                player.movimento()
 
-                            if (event.type == pygame.KEYDOWN):
-                                if (event.key == pygame.K_c):
-                                    return self.CorredorInfinito()
+            #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
+            if player.invulnerabilidade > 0:
+                player.invulnerabilidade -= 1
 
-                        player.processar_evento(event)
+            player.no_chao = False
 
-                #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
-                if self.estado == 'jogando':
-                    player.atualizar_animacao()
-                    player.movimento()
+            #DESENHA A VIDA NA TELA
+            player.atualizar_vida()
 
-                #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
-                if player.invulnerabilidade > 0:
-                    player.invulnerabilidade -= 1
+            #CONTADOR PARA NÃO TER ATAQUE INFINITO
+            if player.cooldown_atq > 0:
+                player.cooldown_atq -= 1
 
-                player.no_chao = False
+            #VERIFICA A COLISÃO DO PERSONAGEM
+            for plataforma in self.plataformas:
+                pe_anterior = player.y_anterior + player.colisao.height
+                pe_atual = player.colisao.bottom
 
-                #DESENHA A VIDA NA TELA
-                player.atualizar_vida()
+                #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
+                if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
+                    player.vel_y = 0
+                    player.pos[1] = plataforma.top - player.colisao.height
+                    player.colisao.y = player.pos[1]
+                    player.no_chao = True
+                    player.pulo_duplo = True
+                    break
+            
+            #DESENHA O JOGADOR
+            if self.estado == 'jogando':
+                player.desenhar()
 
-                #CONTADOR PARA NÃO TER ATAQUE INFINITO
-                if player.cooldown_atq > 0:
-                    player.cooldown_atq -= 1
+            #VERIFICA SE O JOGADOR MORREU
+            if player.vida <= 0:
+                self.estado = 'Game over'
+                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
+                self.screen.blit(texto, (400, 300))
 
-                #VERIFICA A COLISÃO DO PERSONAGEM
-                for plataforma in self.plataformas:
-                    pe_anterior = player.y_anterior + player.colisao.height
-                    pe_atual = player.colisao.bottom
+            #ATUALIZA A TELA
+            pygame.display.update()
 
-                    #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
-                    if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
-                        player.vel_y = 0
-                        player.pos[1] = plataforma.top - player.colisao.height
-                        player.colisao.y = player.pos[1]
-                        player.no_chao = True
-                        player.pulo_duplo = True
-                        break
-                
-                #DESENHA O JOGADOR
-                if self.estado == 'jogando':
-                    player.desenhar()
+            #TICK NO RELÓGIO
+            self.clock.tick(60)
 
-                #VERIFICA SE O JOGADOR MORREU
-                if player.vida <= 0:
-                    self.estado = 'Game over'
-                    texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                    self.screen.blit(texto, (400, 300))
-
-                #ATUALIZA A TELA
-                pygame.display.update()
-
-                #TICK NO RELÓGIO
-                self.clock.tick(60)
+       
 
     def Tela_1(self):
 

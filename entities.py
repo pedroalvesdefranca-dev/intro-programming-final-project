@@ -12,6 +12,7 @@ class Entidade:
         self.contagem_frames = 0
 
 class Player(Entidade):
+
     def __init__(self, pos, screen, vida):
         super().__init__(pos)
 
@@ -20,7 +21,7 @@ class Player(Entidade):
 
         self.screen = screen
 
-        self.colisao = pygame.Rect(pos[0], pos[1], 80, 80)
+        self.colisao = pygame.Rect(pos[0], pos[1], 160, 170)
 
         self.contagem_moeda = 0
 
@@ -52,32 +53,30 @@ class Player(Entidade):
         self.coracao_cheio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_cheia.png'), (64, 64))
         self.coracao_vazio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_vazia.png'), (64, 64))
         
-        #todos o sprites a seguir contem a imagem de umberto
-        #cada frame pode ser verificado na pasta assents onde lá estão cada imagem 
-        #o nome das imagens já descrevem a ação que elas fazem parte
-        self.idle = [pygame.transform.scale(pygame.image.load("Assets/Personagem/parado.png"), (50, 90))]
+        #DEFINIÇÃO DOS SPRITES DO PERSONAGEM
+        self.idle = [pygame.transform.scale(pygame.image.load("Assets/Personagem/parado.png"), (100, 180))]
         
-        self.andando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_0.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_1.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_2.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_3.png"), (100, 100))]
+        self.andando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_0.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_1.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_2.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_andando_3.png"), (200, 200))]
 
-        self.pulando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_0.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_1.png"), (100, 100))]
+        self.pulando = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_0.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulando_1.png"), (200, 200))]
 
 
-        self.puloduplo =[pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_0.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_1.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_3.png"), (100, 100)),
-                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_2.png"), (100, 100))]
+        self.puloduplo =[pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_0.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_1.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_3.png"), (200, 200)),
+                        pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_pulo_duplo_2.png"), (200, 200))]
 
-        self.dash = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_0.png"), (100, 100)),
-                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_1.png"), (100, 100)),
-                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_2.png"), (100, 100)),
-                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_3.png"), (100, 100))]
+        self.dash = [pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_0.png"), (200, 200)),
+                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_1.png"), (200, 200)),
+                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_2.png"), (200, 200)),
+                    pygame.transform.scale(pygame.image.load("Assets/Personagem/sprite_dash_3.png"), (200, 200))]
         
         self.ataque = [
-            pygame.transform.scale(pygame.image.load("Assets/Personagem/atacando.png"), (100, 100))
+            pygame.transform.scale(pygame.image.load("Assets/Personagem/atacando.png"), (200, 200))
         ]
         
         self.animacao = self.idle
@@ -102,6 +101,7 @@ class Player(Entidade):
                 self.state_antes_dash = self.state
                 self.state = 'dash'
 
+            #EVENTO DE ATACAR
             if event.key == pygame.K_o and self.state != 'dash' and self.cooldown_atq == 0:
                 self.atacar()
                 self.cooldown_atq = cst.COOLDOWN_ATQ
