@@ -140,7 +140,7 @@ class Game:
         cracha_coletado = False
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3)
+        player = Player((100, 510), self.screen, 3, 0)
 
         while True:
 
@@ -285,6 +285,9 @@ class Game:
             #DESENHA A VIDA NA TELA
             player.atualizar_vida()
 
+            #DESENHA A BARRA DE ESPECIAL
+            player.atualizar_especial()
+
             #CONTADOR PARA NÃO TER ATAQUE INFINITO
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
@@ -323,7 +326,7 @@ class Game:
     def CorredorInfinito(self):
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((50, 510), self.screen, 3)
+        player = Player((50, 510), self.screen, 3, 0)
 
         #OBJETO E VARIAVEL NECESSÁRIO PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
@@ -420,6 +423,9 @@ class Game:
             #DESENHA A VIDA NA TELA
             player.atualizar_vida()
 
+            #DESENHA BARRA DE ESPECIAL NA TELA
+            player.atualizar_especial()
+
             #CONTADOR PARA NÃO TER ATAQUE INFINITO
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
@@ -460,6 +466,7 @@ class Game:
             player.colisao.y = 500
 
             player.vida = 3
+            player.especial = 0
             player.vel_x = 0
             player.vel_y = 0
             player.contagem_moeda = 0
