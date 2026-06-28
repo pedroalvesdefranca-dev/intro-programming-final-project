@@ -9,6 +9,9 @@ class Entidade:
         self.vel_x = 0
         self.vel_y = 0
 
+        self.velocidade_antes_paralax = cst.VEL_PERSONAGEM
+        self.dash_antes_paralax = cst.VELDASH
+
         self.contagem_frames = 0
 
 class Player(Entidade):
@@ -248,6 +251,18 @@ class Player(Entidade):
             frame = pygame.transform.flip(frame, True, False)
 
         self.screen.blit(frame, self.pos)
+
+    def emparalax(self):
+
+        #ISSO FAZ COM QUE O PERSONAGEM MANTENHA AS ANIMAÇÕES MAS NÃO SE MOVA DURANTE O PARALAX
+        cst.VEL_PERSONAGEM = 0.000001
+        cst.VELDASH = 0.000001
+
+    def semparalax(self, empulso):
+
+        cst.VEL_PERSONAGEM = self.velocidade_antes_paralax
+        cst.VELDASH = self.dash_antes_paralax
+        self.pos[0] += empulso
 
 class Moeda(Entidade):
     def __init__(self, pos, screen):

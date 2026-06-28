@@ -1,5 +1,6 @@
 #IMPORTANDO OS MÓDULOS A SEREM UTILIZADOS
 import pygame
+from pygame.locals import *
 import sys
 import constantes as cst
 from entities import Player
@@ -58,11 +59,17 @@ class Game:
         #IMAGEM DO MENU
         self.tela_menu = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-menu.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
-        #IMAGEM DO TUTORIAL
+        #IMAGEM DA TELA 2 - TUTORIAL
         self.tela_tutorial = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-Tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+
+        #IMAGEM DA TELA 2 - CORREDOR INFINITO
+        self.tela_corredor_infinito = pygame.transform.scale(pygame.image.load('Assets/Cenários/Corredor-Infinito.png'), (7123, 800))
 
         #SPRITE DO CHÃO
         self.chao = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao.png'), (cst.SCREEN_WIDTH, 200))
+
+        #SPRITE DO CHÃO DA TELA 2
+        self.chao2 = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao_tela2.png'), (9000, 200))
 
         #SPRITE DA CATRACA
         self.catraca = pygame.transform.scale(pygame.image.load('Assets/Ambiente/catraca1.png'), (150, 150))
@@ -76,20 +83,6 @@ class Game:
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_04.png'), (90, 90)),
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_05.png'), (90, 90))
         ]
-    #ORDEM PARA ESCREVER OS CENÁRIOS
-    #1: Desenhar o cenário e o chão (se tiver plataformas é só botar la na lista do self.plataformas pra adicionar as colisões delas) e quando forem checar a
-    # colisão com o boneco, só vc botar self.plataformas[indice:indice] pra determinar quais colisões serão consideradas naquela tela específica.
-
-    #2: Atualizar as informações do jogador se ele ainda não tiver morrido.
-
-    #3: Checar as colisões com as plataformas (chão incluso)
-
-    #4: Por fim desenhar o player e no final de tudo ver se ele morre para chamar a função reiniciar(), que coloca o player de volta na primeira tela do jogo
-
-    #Observações:
-    #Se forem adicionar alguma constante nova, modifiquem o arquivo constantes.py, e para usar essa constante em outros arquivos é só usar 'cst.(nome da constante)'
-    #Para criar os coletáveis é só ir no arquivo entities.py, criar uma nova classe que herda da classe Entidade(que tem apenas posição e colisão) e adicionar atributos que serão necessários
-    #Pedro Alves pra tu fazer as mudanças de sprites pode ir na entites.py na classe Player e ir no método de atualizar_animacao() que la é onde tudo acontece
 
     def MenuInicial(self):
 
@@ -332,13 +325,59 @@ class Game:
         #DEFINE O OBJETO DO PLAYER
         player = Player((50, 510), self.screen, 3)
 
+        #OBJETO E VARIAVEL NECESSÁRIO PARA REALIZAR O PARALAX
+        obj_paralax = pygame.Rect(650, 0, 1, 900)
+        paralax = False
+
+        tela_x = 0
+
         while True:
 
+            self.screen.fill((0,0,0))
+
             #DESENHA NA TELA O CENÁRIO
-            self.screen.blit(self.tela_tutorial, (0, 0))
+            self.screen.blit(self.tela_corredor_infinito, (tela_x, 0))
 
             #DESENHA O CHÃO
-            self.screen.blit(self.chao, (0, 710))
+            self.screen.blit(self.chao2, (tela_x, 710))
+ 
+            #DESATIVA O PARALAX NO INÍCIO
+            if (tela_x >= 0 and paralax == True):
+                paralax = False
+                tela_x = 0
+                player.semparalax(-8)
+
+            #ATIVA O PARALAX NO INÍCIO
+            if (player.colisao.right == obj_paralax.left):
+                paralax = True
+                player.emparalax()
+
+            #DESAATIVA O PARALAX NO FIM DA TELA
+            if (tela_x <= -5823 and paralax == True):
+                paralax = False
+                tela_x = -5823
+                player.semparalax(+8)
+
+            #ATIVA O PARALAX NO FIM DA TELA
+            if (player.colisao.colliderect(obj_paralax)):
+                paralax = True
+                player.emparalax()
+
+            #PARALAX PARA A DIREITA
+            if (pygame.key.get_pressed()[K_d] and paralax == True):
+                
+                tela_x -= 8
+
+                if pygame.key.get_pressed()[K_p]:
+                    tela_x -= 25
+
+            #PARALAX PARA A ESQUERDA
+            if (pygame.key.get_pressed()[K_a] and paralax == True):
+                
+                tela_x += 8
+
+                if pygame.key.get_pressed()[K_p]:
+                    tela_x += 25
 
             #VERIFICA EVENTOS
             for event in pygame.event.get():
