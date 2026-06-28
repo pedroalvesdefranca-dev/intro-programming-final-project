@@ -113,10 +113,10 @@ class Game:
         ]
 
         mensagens_tutorial = [
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_00.png'), (900, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_01.png'), (900, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_02.png'), (900, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_03.png'), (900, 256))
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_00.png'), (700, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_01.png'), (700, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_02.png'), (700, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_03.png'), (700, 256))
         ]
 
         seta_baixo = [
@@ -213,7 +213,7 @@ class Game:
                     self.contagem_frames_seta = 0
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (190, 150))
+                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
 
                 #DESENHA A PRIMEIRA MENSAGEM
                 self.screen.blit(mensagens_tutorial[0], (350, 35))
@@ -225,7 +225,7 @@ class Game:
             if self.contagem_tutorial > 6 and self.contagem_tutorial < 12:
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (190, 150))
+                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
 
                 self.screen.blit(mensagens_tutorial[1], (350, 35))
 
@@ -233,7 +233,7 @@ class Game:
             if self.contagem_tutorial > 12 and self.contagem_tutorial < 18:
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (190, 150))
+                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
 
             
                 self.screen.blit(mensagens_tutorial[2], (350, 35))
@@ -254,7 +254,7 @@ class Game:
                     self.contagem_frames_seta = 0
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (190, 150))
+                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
 
                 self.screen.blit(mensagens_tutorial[3], (350, 35))
                 self.screen.blit(seta_baixo[int(self.contagem_frames_seta)], (cracha_obj.x - 50, cracha_obj.y - 110))

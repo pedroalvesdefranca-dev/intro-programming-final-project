@@ -236,13 +236,13 @@ class Player(Entidade):
 
     def atualizar_especial(self):
         if self.especial == 0:
-            self.screen.blit(self.especial_vazio, (35, 280))
+            self.screen.blit(self.especial_vazio, (35, 150))
         elif self.especial == 1:
-            self.screen.blit(self.especial_1_3, (35, 280))
+            self.screen.blit(self.especial_1_3, (35, 150))
         elif self.especial == 2:
-            self.screen.blit(self.especial_2_3, (35, 280))
+            self.screen.blit(self.especial_2_3, (35, 150))
         elif self.especial == 3:
-            self.screen.blit(self.especial_cheio, (35, 280))
+            self.screen.blit(self.especial_cheio, (35, 150))
 
     def desenhar(self):
         
