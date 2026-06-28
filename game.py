@@ -20,8 +20,24 @@ class Game:
         self.screen = pygame.display.set_mode((cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
 
-        #DEFINE UM CONTADOR DE FRAMES QUE SERÁ UTILIZADO PARA COOLDOWN
+        #DEFINE UM CONTADOR PARA AS MENSAGENS DO TUTORIAL
+        self.contagem_tutorial = 0
+
+        #DEFINE UM CONTADOR DE FRAMES QUE SERÁ UTILIZADO PARA ANIMAÇÕES
         self.contagem_frames = 0
+
+        #DEFINE UM CONTADOR DE FRAMES QUE SERÁ UTILIZADO PARA FAZER AS ANIMAÇÕES DOS BOTÕES DO TUTORIAL
+        self.contagem_frames_botoes = 0
+
+        #DEFINE UM CONTADOR PARA A ANIMAÇÃO DA SETA DO TUTORIAL
+        self.contagem_frames_seta = 0
+
+        #DEFINE UM CONTADOR DE FRAMES QUE SERÁ UTILIZADO PARA FAZER AS ANIMAÇÕES DO CRACHA
+        self.contagem_frames_cracha = 0 
+
+        self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
+        self.som_pegou_cracha = pygame.mixer.Sound('Assets/Sons/som_pegou_cracha.wav')
+        self.som_pegou_cracha.set_volume(0.3)
 
         #DEFINE VARIÁVEIS INICIAIS
         self.tela_anterior = None
@@ -36,7 +52,7 @@ class Game:
             pygame.Rect(0, 700, 1800, 160)
         ]
 
-        #IMAGEM DO MENO
+        #IMAGEM DO MENU
         self.tela_menu = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-menu.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
         #IMAGEM DO TUTORIAL
@@ -49,8 +65,14 @@ class Game:
         self.catraca = pygame.transform.scale(pygame.image.load('Assets/Ambiente/catraca1.png'), (150, 150))
 
         #SPRITE DO CRACHÁ
-        self.cracha = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha.png'), (90, 90))
-
+        self.cracha = [
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_00.png'), (90, 90)),
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_01.png'), (90, 90)),
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_02.png'), (90, 90)),
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_03.png'), (90, 90)),
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_04.png'), (90, 90)),
+        pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_05.png'), (90, 90))
+        ]
     #ORDEM PARA ESCREVER OS CENÁRIOS
     #1: Desenhar o cenário e o chão (se tiver plataformas é só botar la na lista do self.plataformas pra adicionar as colisões delas) e quando forem checar a
     # colisão com o boneco, só vc botar self.plataformas[indice:indice] pra determinar quais colisões serão consideradas naquela tela específica.
@@ -84,11 +106,35 @@ class Game:
 
     def TelaTutorial(self):
 
+        animacoes_botao_C = [
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_00.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_01.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_02.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_03.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_04.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_05.png'), (128, 128))
+        ]
+
+        mensagens_tutorial = [
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_00.png'), (900, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_01.png'), (900, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_02.png'), (900, 256)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_03.png'), (900, 256))
+        ]
+
+        seta_baixo = [
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_00.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_01.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_02.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_03.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_04.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_05.png'), (200, 200))
+            ]
+
         #OBJETO DE COLISÃO PARA A PRÓXIMA FASE
         transicao_1_2 = pygame.Rect(1100, 560, 150, 150)
 
         #OBJETO DO CRACHÁ
-        cracha_obj = pygame.Rect(950, 580, 90, 90)
         cracha_coletado = False
 
         #DEFINE O OBJETO DO PLAYER
@@ -108,9 +154,7 @@ class Game:
             #DESENHA O CHÃO
             self.screen.blit(self.chao, (0, 710))
 
-            #DESENHA O CRACHÁ CASO ELE NÃO TENHA SIDO COLETADO
-            if (cracha_coletado == False):
-                self.screen.blit(self.cracha, (950, 580))
+            self.contagem_tutorial += 0.017
 
             #VERIFICA EVENTOS
             for event in pygame.event.get():
@@ -144,13 +188,50 @@ class Game:
 
                             #AVANÇA PARA A PRÓXIMA FASE CASO PASSE O CRACHÁ NA CATRACA
                             if (event.key == pygame.K_c) and (cracha_coletado == True):
+                                self.som_catraca_girando.play()
                                 return self.CorredorInfinito()
-                            
-                    #COLISÃO COM O CRACHÁ:
-                    if (player.colisao.colliderect(cracha_obj)):
-                        cracha_coletado = True
 
                     player.processar_evento(event)
+            
+            if self.contagem_tutorial > 2 and self.contagem_tutorial < 6:
+                self.contagem_frames_seta += 0.2
+                if self.contagem_frames_seta >= len(seta_baixo):
+                    self.contagem_frames_seta = 0
+
+                self.screen.blit(mensagens_tutorial[0], (350, 35))
+                self.screen.blit(seta_baixo[int(self.contagem_frames_seta)], (player.pos[0] - 45, player.pos[1] - 130))
+            if self.contagem_tutorial > 6 and self.contagem_tutorial < 12:
+                self.screen.blit(mensagens_tutorial[1], (350, 35))
+            if self.contagem_tutorial > 12 and self.contagem_tutorial < 18:
+                self.screen.blit(mensagens_tutorial[2], (350, 35))
+            if self.contagem_tutorial > 18 and cracha_coletado == False:
+                cracha_obj = pygame.Rect(950, 580, 90, 90)
+
+                #DESENHA O CRACHÁ CASO ELE NÃO TENHA SIDO COLETADO
+                if (cracha_coletado == False):
+                    self.contagem_frames_cracha += 0.1
+                    if self.contagem_frames_cracha >= len(self.cracha):
+                        self.contagem_frames_cracha = 0
+                    self.screen.blit(self.cracha[int(self.contagem_frames_cracha)], (950, 580))
+
+                self.contagem_frames_seta += 0.2
+                if self.contagem_frames_seta >= len(seta_baixo):
+                    self.contagem_frames_seta = 0
+
+                self.screen.blit(mensagens_tutorial[3], (350, 35))
+                self.screen.blit(seta_baixo[int(self.contagem_frames_seta)], (cracha_obj.x - 50, cracha_obj.y - 110))
+
+                #COLISÃO COM O CRACHÁ:
+                if (player.colisao.colliderect(cracha_obj)):
+                    cracha_obj = pygame.Rect(9999, 580, 90, 90)
+                    self.som_pegou_cracha.play()
+                    cracha_coletado = True
+
+            if (player.colisao.colliderect(transicao_1_2)):
+                self.contagem_frames_botoes += 0.3
+                if self.contagem_frames_botoes > len(animacoes_botao_C):
+                    self.contagem_frames_botoes = 0
+                self.screen.blit(animacoes_botao_C[int(self.contagem_frames_botoes)], (1120, 450))
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
@@ -203,23 +284,13 @@ class Game:
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
     def CorredorInfinito(self):
 
-        #OBJETO DE COLISÃO PARA A PRÓXIMA FASE
-        transicao_1_2 = pygame.Rect(1150, 600, 50, 200)
-
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3)
-
+        player = Player((50, 510), self.screen, 3)
 
         while True:
 
-            #DEFINE A TELA ATUAL
-            self.tela_atual == 'Tela Tutorial'
-
             #DESENHA NA TELA O CENÁRIO
             self.screen.blit(self.tela_tutorial, (0, 0))
-
-            #DESENHA O OBJETO DE COLISÃO
-            pygame.draw.rect(self.screen, cst.AMARELO, transicao_1_2)
 
             #DESENHA O CHÃO
             self.screen.blit(self.chao, (0, 710))
@@ -248,13 +319,6 @@ class Game:
 
                 #JOGADOR VIVO
                 elif self.estado == 'jogando':
-
-                    #COLISÃO COM A CATRACA PARA O PRÓXIMO ESTÁDO
-                    if (player.colisao.colliderect(transicao_1_2)):
-
-                        if (event.type == pygame.KEYDOWN):
-                            if (event.key == pygame.K_c):
-                                return self.CorredorInfinito()
 
                     player.processar_evento(event)
 
@@ -306,13 +370,6 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-       
-
-    def Tela_1(self):
-
-        while True:
-            self.screen.blit(self.chao, (0, 800))
-
     def Reiniciar(self, player):
             player.pos = [100, 500]
             player.colisao.x = 100
@@ -323,11 +380,6 @@ class Game:
             player.vel_y = 0
             player.contagem_moeda = 0
             player.invulnerabilidade = 0
-
-            self.moedas = [
-                Moeda((865, 525), self.screen),
-                Moeda((1215, 450), self.screen)
-            ]
 
             return self.TelaTutorial()
 

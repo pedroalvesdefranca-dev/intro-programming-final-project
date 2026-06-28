@@ -157,7 +157,7 @@ class Player(Entidade):
 
         #REINICIA O DASH RAPIDO PORÉM APENAS NO CHÃO
         if (self.cooldown_dash > 0 and self.no_chao):
-            self.cooldown_dash -= 7
+            self.cooldown_dash -= 5
 
             if (self.cooldown_dash < 0):
                 self.cooldown_dash = 0
