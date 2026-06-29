@@ -265,7 +265,7 @@ class Game:
                     self.som_pegou_cracha.play()
                     cracha_coletado = True
 
-            if (player.colisao.colliderect(transicao_1_2)):
+            if (player.colisao.colliderect(transicao_1_2) and cracha_coletado):
                 self.contagem_frames_botoes += 0.3
                 if self.contagem_frames_botoes > len(animacoes_botao_C):
                     self.contagem_frames_botoes = 0
@@ -398,16 +398,16 @@ class Game:
                 
                 self.tela_x -= 8
 
-                if player.state == 'dash':
-                    self.tela_x -= 25
+            if player.state == 'dash' and player.andando_direita:
+                self.tela_x -= 25
 
             #PARALAX PARA A ESQUERDA
             if (pygame.key.get_pressed()[K_a] and paralax == True):
                 
                 self.tela_x += 8
-                
-                if player.state == 'dash':
-                    self.tela_x += 25
+
+            if player.state == 'dash' and not player.andando_direita:
+                self.tela_x += 25
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
