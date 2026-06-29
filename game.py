@@ -261,7 +261,7 @@ class Game:
 
                 #COLISÃO COM O CRACHÁ:
                 if (player.colisao.colliderect(cracha_obj)):
-                    cracha_obj = pygame.Rect(9999, 580, 90, 90)
+                    cracha_obj = None
                     self.som_pegou_cracha.play()
                     cracha_coletado = True
 
@@ -395,7 +395,7 @@ class Game:
 
             #PARALAX PARA A DIREITA
             if (pygame.key.get_pressed()[K_d] and paralax == True):
-                
+
                 self.tela_x -= 8
 
             if player.state == 'dash' and player.andando_direita:

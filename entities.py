@@ -40,6 +40,9 @@ class Player(Entidade):
 
         self.pulo_duplo = False
 
+        self.desbloqueou_dash = False
+        self.desbloqueou_pulo_duplo = False
+
         self.andando_direita = True
         self.no_chao = False
 
@@ -106,7 +109,7 @@ class Player(Entidade):
                 self.state = 'pulo duplo'
 
             #EVENTO DE DAR DASH
-            if event.key == pygame.K_p and self.cooldown_dash == 0:
+            if event.key == pygame.K_p and self.cooldown_dash == 0 and self.desbloqueou_dash:
                 self.time_dash = cst.TEMPODASH
                 self.cooldown_dash = cst.COOLDOWN_DASH
                 self.state_antes_dash = self.state
@@ -154,7 +157,7 @@ class Player(Entidade):
             self.animacao = self.pulando
         elif self.state == 'idle':
             self.animacao = self.idle
-        elif self.state == 'pulo duplo':
+        elif self.state == 'pulo duplo' and self.desbloqueou_pulo_duplo:
             self.animacao = self.puloduplo
 
         if self.state != 'pulando':
@@ -192,7 +195,7 @@ class Player(Entidade):
             if self.pulo > 0 and self.no_chao:
                 self.vel_y = cst.PULO
 
-            elif self.pulo > 0 and self.pulo_duplo and self.vel_y >= 0:
+            elif self.pulo > 0 and self.pulo_duplo and self.vel_y >= 0 and self.desbloqueou_pulo_duplo:
                 self.vel_y = cst.PULO
                 self.pulo_duplo = False
 
@@ -297,7 +300,13 @@ class Player(Entidade):
         cst.VELDASH = self.dash_antes_paralax
         self.pos[0] += empulso
 
-class Inimigo1(Entidade):
+class Inimigo_Corpo_a_Corpo(Entidade):
+    def __init__(self, pos, screen, vida):
+        super().__init__(pos)
+        self.screen = screen
+        self.vida = vida
+
+class Inimigo_Longa_Distancia(Entidade):
     def __init__(self, pos, screen, vida):
         super().__init__(pos)
         self.screen = screen
