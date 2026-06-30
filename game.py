@@ -1,9 +1,10 @@
 #IMPORTANDO OS MÓDULOS A SEREM UTILIZADOS
 import pygame
+import random
 from pygame.locals import *
 import sys
 import constantes as cst
-from entities import Player
+from entities import Player, Inimigo_Corpo_a_Corpo
 
 #INICIA O PYGAME
 pygame.init()
@@ -82,6 +83,13 @@ class Game:
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_03.png'), (90, 90)),
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_04.png'), (90, 90)),
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_05.png'), (90, 90))
+        ]
+
+        # Sprites da barra de vida do inimigo
+        self.sprites_vida_inimigo = [
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_00.png'), (60, 15)), # 0 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_01.png'), (60, 15)), # 1 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_02.png'), (60, 15))  # 2 danos
         ]
 
     def MenuInicial(self):
@@ -328,6 +336,10 @@ class Game:
         #DEFINE O OBJETO DO PLAYER
         player = Player((50, 510), self.screen, 3, 0)
 
+        # Prepara a lista de inimigos e um timer para spawn
+        lista_inimigos = []
+        timer_spawn = 60 # Começa em 60 frames (1 segundo) para o primeiro inimigo aparecer
+
         #OBJETO E VARIAVEL NECESSÁRIO PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
         paralax = False
@@ -397,22 +409,65 @@ class Game:
             if (pygame.key.get_pressed()[K_d] and paralax == True):
 
                 self.tela_x -= 8
+                
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(-8)
 
             if player.state == 'dash' and player.andando_direita and paralax == True:
                 self.tela_x -= 25
+
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(-25)
 
             #PARALAX PARA A ESQUERDA
             if (pygame.key.get_pressed()[K_a] and paralax == True):
                 
                 self.tela_x += 8
 
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(8)
+
             if player.state == 'dash' and not player.andando_direita and paralax == True:
                 self.tela_x += 25
+
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(25)
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
                 player.atualizar_animacao()
                 player.movimento()
+                
+                # --- LÓGICA DE SPAWN ALEATÓRIO ---
+                timer_spawn -= 1
+                if timer_spawn <= 0:
+                    # Cria o inimigo fora da tela na direita (posição X: 1400)
+                    novo_inimigo = Inimigo_Corpo_a_Corpo([1400, 530], self.screen, self.sprites_vida_inimigo)
+                    lista_inimigos.append(novo_inimigo)
+                    
+                    # Sorteia um tempo para o próximo inimigo
+                    timer_spawn = random.randint(180, 240)
+                
+                # Atualizar os dados dos inimigos
+                for ini in lista_inimigos[:]: 
+                    ini.atualizar(player, self.plataformas)
+
+                    # Verifica se o soco do player acertou este inimigo
+                    if player.hitbox_atq is not None and ini.vida > 0 and ini.invulnerabilidade == 0:
+                        if player.hitbox_atq.colliderect(ini.colisao):
+                            ini.vida -= 1
+                            ini.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
+                    
+                    # Verifica se este inimigo encostou no player
+                    if ini.vida > 0 and player.invulnerabilidade == 0:
+                        if ini.colisao.colliderect(player.colisao):
+                            player.vida -= 1
+                            player.invulnerabilidade = cst.INVULNERAVEL
+                            player.som_dano.play()
+                    
+                    # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
+                    if ini.vida <= 0:
+                        lista_inimigos.remove(ini)
 
             #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
             if player.invulnerabilidade > 0:
@@ -444,9 +499,11 @@ class Game:
                     player.pulo_duplo = True
                     break
             
-            #DESENHA O JOGADOR
+            #DESENHA O JOGADOR e o inimigo
             if self.estado == 'jogando':
                 player.desenhar()
+                for ini in lista_inimigos:
+                    ini.desenhar()
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:

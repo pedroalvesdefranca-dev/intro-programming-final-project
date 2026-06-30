@@ -226,12 +226,12 @@ class Player(Entidade):
 
         #DEFINE A COLISÃO DO ATAQUE PARA A DIREITA
         if self.andando_direita:
-            self.hitbox_atq = pygame.Rect(self.pos[0] + 160, altura_soco, 50, 64)
+            self.hitbox_atq = pygame.Rect(self.pos[0] + 175, altura_soco, 50, 64)
 
         #DEFINE A COLISÃO DO ATAQUE PARA A ESQUERDA
         else:
             #Empurra a hitbox mais para a esquerda para acompanhar o soco
-            self.hitbox_atq = pygame.Rect(self.pos[0] - 110, altura_soco, 50, 64)
+            self.hitbox_atq = pygame.Rect(self.pos[0] - 125, altura_soco, 50, 64)
 
     def atualizar_vida(self):
         if self.vida == 3:
@@ -301,10 +301,74 @@ class Player(Entidade):
         self.pos[0] += empulso
 
 class Inimigo_Corpo_a_Corpo(Entidade):
-    def __init__(self, pos, screen, vida):
+    def __init__(self, pos, screen, sprites_vida):
         super().__init__(pos)
         self.screen = screen
-        self.vida = vida
+        self.vida = 3
+        self.sprites_vida = sprites_vida
+        self.colisao = pygame.Rect(self.pos[0], self.pos[1], 160, 170)
+        self.colisao = pygame.Rect(self.pos[0], self.pos[1], 160, 170)
+        self.invulnerabilidade = 0
+        self.y_anterior = self.pos[1]
+
+    def atualizar(self, player, plataformas):
+        # Se a vida for 0, ele morre e não faz mais nada
+        if self.vida <= 0:
+            return
+
+        #Persegue o jogador no eixo X
+        if self.pos[0] < player.pos[0]:
+            self.vel_x = cst.VEL_INIMIGO
+        elif self.pos[0] > player.pos[0]:
+            self.vel_x = -cst.VEL_INIMIGO
+
+        # Aplica gravidade para ele não voar
+        self.vel_y += cst.GRAVIDADE
+        
+        self.y_anterior = self.pos[1]
+        self.pos[0] += self.vel_x
+        self.pos[1] += self.vel_y
+        
+        self.colisao.x = self.pos[0]
+        self.colisao.y = self.pos[1]
+
+        # Colisão do inimigo com o chão
+        for plataforma in plataformas:
+            pe_anterior = self.y_anterior + self.colisao.height
+            pe_atual = self.colisao.bottom
+            if self.colisao.right > plataforma.left and self.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and self.vel_y >= 0:
+                self.vel_y = 0
+                self.pos[1] = plataforma.top - self.colisao.height
+                self.colisao.y = self.pos[1]
+                break
+
+        # Reduz o tempo de invulnerabilidade
+        if self.invulnerabilidade > 0:
+            self.invulnerabilidade -= 1
+
+    def desenhar(self):
+        if self.vida > 0:
+
+            # Efeito de piscar quando toma dano
+            if self.invulnerabilidade > 0 and (self.invulnerabilidade // 5) % 2 == 0:
+                pass 
+            else:
+                # Desenha o quadrado vermelho descendo até ao mesmo nível visual do player
+                retangulo_visual = pygame.Rect(self.pos[0], self.pos[1], 160, 180)
+                pygame.draw.rect(self.screen, (255, 0, 0), retangulo_visual)
+            
+            # Lógica da Barra de Vida Flutuante
+            indice_sprite = 3 - self.vida
+            if 0 <= indice_sprite <= 2:
+                sprite = self.sprites_vida[indice_sprite]
+                # Centraliza a barra acima do inimigo
+                pos_x = self.pos[0] + (self.colisao.width / 2) - (sprite.get_width() / 2)
+                pos_y = self.pos[1] - 60  
+                self.screen.blit(sprite, (pos_x, pos_y))
+                
+    def aplicar_paralax(self, deslocamento):
+        self.pos[0] += deslocamento
+        self.colisao.x = self.pos[0]
 
 class Inimigo_Longa_Distancia(Entidade):
     def __init__(self, pos, screen, vida):
