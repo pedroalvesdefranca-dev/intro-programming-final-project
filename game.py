@@ -1,9 +1,10 @@
 #IMPORTANDO OS MÓDULOS A SEREM UTILIZADOS
 import pygame
+import random
 from pygame.locals import *
 import sys
 import constantes as cst
-from entities import Player
+from entities import Player, Inimigo_Corpo_a_Corpo
 
 #INICIA O PYGAME
 pygame.init()
@@ -119,6 +120,39 @@ class Game:
             pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_04.png'), (200, 200)),
             pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_05.png'), (200, 200))
             ]
+
+        #SPRITE DOS BOTÕES C
+        self.animacoes_botao_C = [
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_00.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_01.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_02.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_03.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_04.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_05.png'), (128, 128))
+        ]
+
+        #SPRITE DA CABEÇA DE STEFAN
+        self.cabeca_stefan = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan1.png'), (140, 140)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan2.png'), (140, 140))
+        ]
+
+        #SPRITE DA SETA PARA BAIXO
+        self.seta_baixo = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_00.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_01.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_02.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_03.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_04.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_05.png'), (200, 200))
+            ]
+
+        # Sprites da barra de vida do inimigo
+        self.sprites_vida_inimigo = [
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_00.png'), (200, 100)), # 0 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_01.png'), (200, 100)), # 1 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_02.png'), (200, 100))  # 2 danos
+        ]
 
     def MenuInicial(self):
 
@@ -353,11 +387,16 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self, tela_x):
+    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False):
         self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((50, 510), self.screen, 3, 0)
+        player = Player((50, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+
+        # Prepara a lista de inimigos e um timer para spawn
+        lista_inimigos = []
+        timer_spawn = 60 # Começa em 60 frames (1 segundo) para o primeiro inimigo aparecer
 
         #OBJETO E VARIAVEL NECESSÁRIOS PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
@@ -441,24 +480,68 @@ class Game:
                 player.emparalax()
 
             #PARALAX PARA A DIREITA
-            if (pygame.key.get_pressed()[K_d] and paralax == True):
+            if (pygame.key.get_pressed()[K_d] and paralax == True and self.estado == 'jogando'):
+
                 self.tela_x -= 8
+                
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(-8)
 
             if player.state == 'dash' and player.andando_direita and paralax == True:
                 self.tela_x -= 25
 
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(-25)
+
             #PARALAX PARA A ESQUERDA
-            if (pygame.key.get_pressed()[K_a] and paralax == True):
+            if (pygame.key.get_pressed()[K_a] and paralax == True and self.estado == 'jogando'):
                 
                 self.tela_x += 8
 
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(8)
+
             if player.state == 'dash' and not player.andando_direita and paralax == True:
                 self.tela_x += 25
+
+                for ini in lista_inimigos:
+                    ini.aplicar_paralax(25)
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
                 player.atualizar_animacao()
                 player.movimento()
+                
+                #LÓGICA DE SPAWN ALEATÓRIO
+                timer_spawn -= 1
+                if timer_spawn <= 0:
+                    # Cria o inimigo fora da tela na direita (posição X: 1400)
+                    novo_inimigo = Inimigo_Corpo_a_Corpo([1400, 530], self.screen, self.sprites_vida_inimigo)
+                    lista_inimigos.append(novo_inimigo)
+                    
+                    # Sorteia um tempo para o próximo inimigo
+                    timer_spawn = random.randint(180, 240)
+                
+                # Atualizar os dados dos inimigos
+                for ini in lista_inimigos[:]: 
+                    ini.atualizar(player, self.plataformas)
+
+                    # Verifica se o soco do player acertou este inimigo
+                    if player.hitbox_atq is not None and ini.vida > 0 and ini.invulnerabilidade == 0:
+                        if player.hitbox_atq.colliderect(ini.colisao):
+                            ini.vida -= 1
+                            ini.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
+                    
+                    # Verifica se este inimigo encostou no player
+                    if ini.vida > 0 and player.invulnerabilidade == 0:
+                        if ini.colisao.colliderect(player.colisao):
+                            player.vida -= 1
+                            player.invulnerabilidade = cst.INVULNERAVEL
+                            player.som_dano.play()
+                    
+                    # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
+                    if ini.vida <= 0:
+                        lista_inimigos.remove(ini)
 
             #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
             if player.invulnerabilidade > 0:
@@ -502,8 +585,8 @@ class Game:
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
                     paralax = False
-                    self.valor_salvo_tela_x = tela_x
-                    return self.Grad5()
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.Grad5(player.vida, player.especial, player.desbloqueou_pulo_duplo)
 
             #SEGUNDA PORTA
             if (player.colisao.colliderect(porta2)):
@@ -517,8 +600,8 @@ class Game:
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
                     paralax = False
-                    self.valor_salvo_tela_x = tela_x
-                    return self.LabHardware()
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.LabHardware(player.vida, player.especial, player.desbloqueou_pulo_duplo)
 
             #TERCEIRA PORTA
             if (player.colisao.colliderect(porta3)):   
@@ -532,7 +615,8 @@ class Game:
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
                     paralax = False
-                    return self.Anfiteatro()
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.Anfiteatro(player.vida, player.especial, player.desbloqueou_pulo_duplo)
 
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
@@ -549,6 +633,8 @@ class Game:
             #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
+                for ini in lista_inimigos:
+                    ini.desenhar()
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
@@ -562,8 +648,8 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Grad5(self):
-    
+    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+
         #Mudei o sprite do pulo duplo, e deixei o que estava antes como o dash
         self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (74, 74))
         self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
@@ -571,7 +657,8 @@ class Game:
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3, 0)
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
 
         while True:
 
@@ -639,7 +726,7 @@ class Game:
                 player.cooldown_atq -= 1
             
             if player.colisao.colliderect(self.colisao_voltar_corredor):
-                return self.CorredorInfinito(self.valor_salvo_tela_x)
+                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -683,7 +770,7 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def LabHardware(self):
+    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
 
         self.sprite_powerup_dash = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_dash.png'), (74, 74))
         self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
@@ -691,7 +778,8 @@ class Game:
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3, 0)
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
 
         while True:
 
@@ -803,10 +891,11 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Anfiteatro(self):
+    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3, 0)
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
 
         while True:
 
@@ -896,6 +985,8 @@ class Game:
             #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
+                for ini in lista_inimigos:
+                    ini.desenhar()
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
