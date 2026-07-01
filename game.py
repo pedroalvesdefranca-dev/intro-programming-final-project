@@ -22,7 +22,7 @@ class Game:
 
         #DEFINE SONS
         self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
-        self.som_pegou_coletavel = pygame.mixer.Sound('Assets/Sons/som_pegou_coletável.wav')
+        self.som_pegou_coletavel = pygame.mixer.Sound('Assets/Sons/som_pegou_coletavel.wav')
         self.som_pegou_coletavel.set_volume(10.0)
         self.ost_principal = pygame.mixer.music.load('Assets/Sons/ostprincipal.mp3')
         pygame.mixer.music.play(-1)
