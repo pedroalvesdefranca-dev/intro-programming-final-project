@@ -250,7 +250,7 @@ class Player(Entidade):
             self.screen.blit(self.especial_1_3, (42, 150))
         elif self.especial == 2:
             self.screen.blit(self.especial_2_3, (42, 150))
-        elif self.especial == 3:
+        elif self.especial >= 3:
             self.screen.blit(self.especial_cheio, (42, 150))
 
     def desenhar(self):
@@ -351,12 +351,21 @@ class Inimigo_Corpo_a_Corpo(Entidade):
 
             # Efeito de piscar quando toma dano
             if self.invulnerabilidade > 0 and (self.invulnerabilidade // 5) % 2 == 0:
+
+                #Inimigo dá uma parada quando toma dano
+                if self != 'player':
+                    cst.VEL_INIMIGO = 0
+
                 pass 
             else:
+                #Velocidade volta ao normal depois de parar de piscar
+                if self != 'player' and self.invulnerabilidade == 0:
+                    cst.VEL_INIMIGO = 3
+
                 # Desenha o quadrado vermelho descendo até ao mesmo nível visual do player
                 retangulo_visual = pygame.Rect(self.pos[0], self.pos[1], 160, 180)
                 pygame.draw.rect(self.screen, (255, 0, 0), retangulo_visual)
-            
+
             # Lógica da Barra de Vida Flutuante
             indice_sprite = 3 - self.vida
             if 0 <= indice_sprite <= 2:

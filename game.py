@@ -225,7 +225,7 @@ class Game:
 
                             #REINICIA O JOGO
                             if event.key == pygame.K_r:
-                                self.reiniciar(player)
+                                self.Reiniciar(player)
 
                             #ENCERRA O JOGO
                             if event.key == pygame.K_q:
@@ -387,12 +387,13 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
         self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((50, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+        player.desbloqueou_dash = desbloqueou_dash
 
         # Prepara a lista de inimigos e um timer para spawn
         lista_inimigos = []
@@ -425,7 +426,7 @@ class Game:
 
                             #REINICIA O JOGO
                             if event.key == pygame.K_r:
-                                self.reiniciar(player)
+                                self.Reiniciar(player)
 
                             #ENCERRA O JOGO
                             if event.key == pygame.K_q:
@@ -586,7 +587,7 @@ class Game:
                     player.semparalax(0)
                     paralax = False
                     self.valor_salvo_tela_x = self.tela_x
-                    return self.Grad5(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+                    return self.Grad5(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #SEGUNDA PORTA
             if (player.colisao.colliderect(porta2)):
@@ -601,7 +602,7 @@ class Game:
                     player.semparalax(0)
                     paralax = False
                     self.valor_salvo_tela_x = self.tela_x
-                    return self.LabHardware(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+                    return self.LabHardware(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #TERCEIRA PORTA
             if (player.colisao.colliderect(porta3)):   
@@ -616,7 +617,7 @@ class Game:
                     player.semparalax(0)
                     paralax = False
                     self.valor_salvo_tela_x = self.tela_x
-                    return self.Anfiteatro(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+                    return self.Anfiteatro(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
@@ -648,17 +649,18 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
 
         #Mudei o sprite do pulo duplo, e deixei o que estava antes como o dash
         self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (74, 74))
-        self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
+        self.colisao_powerup = pygame.Rect(1000, 600, 74, 74)
 
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+        player.desbloqueou_dash = desbloqueou_dash
 
         while True:
 
@@ -686,7 +688,7 @@ class Game:
 
                             #REINICIA O JOGO
                             if event.key == pygame.K_r:
-                                self.reiniciar(player)
+                                self.Reiniciar(player)
 
                             #ENCERRA O JOGO
                             if event.key == pygame.K_q:
@@ -698,6 +700,7 @@ class Game:
 
                     player.processar_evento(event)
             
+            #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup):
                 player.desbloqueou_pulo_duplo = True
             
@@ -725,8 +728,9 @@ class Game:
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
             
+            #VOLTA PARA O CORREDOR INFINITO
             if player.colisao.colliderect(self.colisao_voltar_corredor):
-                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo)
+                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -770,16 +774,17 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
 
         self.sprite_powerup_dash = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_dash.png'), (74, 74))
-        self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
+        self.colisao_powerup = pygame.Rect(1000, 600, 74, 74)
 
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+        player.desbloqueou_dash = desbloqueou_dash
 
         while True:
 
@@ -807,7 +812,7 @@ class Game:
 
                             #REINICIA O JOGO
                             if event.key == pygame.K_r:
-                                self.reiniciar(player)
+                                self.Reiniciar(player)
 
                             #ENCERRA O JOGO
                             if event.key == pygame.K_q:
@@ -819,9 +824,9 @@ class Game:
 
                     player.processar_evento(event)
 
+            #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup):
                 player.desbloqueou_dash = True
-            
             if player.desbloqueou_dash == False:
                 self.screen.blit(self.sprite_powerup_dash, (1000, 600))
 
@@ -846,8 +851,9 @@ class Game:
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
 
+            #VOLTA PARA O CORREDOR INFINITO
             if player.colisao.colliderect(self.colisao_voltar_corredor):
-                return self.CorredorInfinito(self.valor_salvo_tela_x)
+                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -891,11 +897,26 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+
+        self.sprite_especial_carga1 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
+        self.colisao_carga1 = self.sprite_especial_carga1.get_rect(topleft = (900, 600))
+        self.coletou_carga1 = False
+
+        self.sprite_especial_carga2 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
+        self.colisao_carga2 = self.sprite_especial_carga2.get_rect(topleft = (1000, 600))
+        self.coletou_carga2 = False
+
+        self.sprite_especial_carga3 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
+        self.colisao_carga3 = self.sprite_especial_carga3.get_rect(topleft = (1100, 600))
+        self.coletou_carga3 = False
+
+        self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+        player.desbloqueou_dash = desbloqueou_dash
 
         while True:
 
@@ -923,7 +944,7 @@ class Game:
 
                             #REINICIA O JOGO
                             if event.key == pygame.K_r:
-                                self.reiniciar(player)
+                                self.Reiniciar(player)
 
                             #ENCERRA O JOGO
                             if event.key == pygame.K_q:
@@ -934,6 +955,29 @@ class Game:
                 elif self.estado == 'jogando':
 
                     player.processar_evento(event)
+
+
+            #DESENHA OU NÃO AS CARGAS
+            if player.colisao.colliderect(self.colisao_carga1):
+                player.especial += 1
+                self.colisao_carga1.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
+                self.coletou_carga1 = True
+            if self.coletou_carga1 == False:
+                self.screen.blit(self.sprite_especial_carga1, self.colisao_carga1)
+            
+            if player.colisao.colliderect(self.colisao_carga2):
+                player.especial += 1
+                self.colisao_carga2.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
+                self.coletou_carga2 = True
+            if self.coletou_carga2 == False:
+                self.screen.blit(self.sprite_especial_carga2, self.colisao_carga2)
+            
+            if player.colisao.colliderect(self.colisao_carga3):
+                player.especial += 1
+                self.colisao_carga3.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
+                self.coletou_carga3 = True
+            if self.coletou_carga3 == False:
+                self.screen.blit(self.sprite_especial_carga3, self.colisao_carga3)
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
@@ -955,6 +999,10 @@ class Game:
             #CONTADOR PARA NÃO TER ATAQUE INFINITO
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
+
+            #VOLTA PARA O CORREDOR INFINITO
+            if player.colisao.colliderect(self.colisao_voltar_corredor):
+                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -985,8 +1033,6 @@ class Game:
             #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
-                for ini in lista_inimigos:
-                    ini.desenhar()
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
@@ -1008,12 +1054,14 @@ class Game:
 
             player.vida = 3
             player.especial = 0
+            player.desbloqueou_pulo_duplo=False
+            player.desbloqueou_dash=False
             player.vel_x = 0
             player.vel_y = 0
             player.contagem_moeda = 0
             player.invulnerabilidade = 0
 
-            return self.TelaTutorial()
+            return self.CorredorInfinito(tela_x=0)
 
 game = Game()
 game.MenuInicial()
