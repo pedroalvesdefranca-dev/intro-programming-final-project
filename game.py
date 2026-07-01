@@ -22,7 +22,7 @@ class Game:
 
         #DEFINE SONS
         self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
-        self.som_pegou_coletavel = pygame.mixer.Sound('Assets/Sons/som_pegou_coletavel.wav')
+        self.som_pegou_coletavel = pygame.mixer.Sound('Assets/Sons/som_pegou_coletável.wav')
         self.som_pegou_coletavel.set_volume(0.3)
 
         #DEFINE VARIÁVEIS INICIAIS
@@ -157,6 +157,8 @@ class Game:
     def MenuInicial(self):
 
         while True:
+
+            return self.CorredorInfinito(0)
 
             #DESENHA A TELA DO MENU
             self.screen.blit(self.tela_menu, (0, 0))
@@ -530,6 +532,7 @@ class Game:
                         if player.hitbox_atq.colliderect(ini.colisao):
                             ini.vida -= 1
                             ini.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
+                            ini.tomoudano = True
                     
                     # Verifica se este inimigo encostou no player
                     if ini.vida > 0 and player.invulnerabilidade == 0:
@@ -537,6 +540,10 @@ class Game:
                             player.vida -= 1
                             player.invulnerabilidade = cst.INVULNERAVEL
                             player.som_dano.play()
+
+                            #MODIFICA O SPRITE DO INIMIGO
+                            ini.atacando = True
+                            ini.atacou = True
                     
                     # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
                     if ini.vida <= 0:
