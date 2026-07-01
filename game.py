@@ -87,9 +87,9 @@ class Game:
 
         # Sprites da barra de vida do inimigo
         self.sprites_vida_inimigo = [
-            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_00.png'), (60, 15)), # 0 dano
-            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_01.png'), (60, 15)), # 1 dano
-            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_02.png'), (60, 15))  # 2 danos
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_00.png'), (200, 100)), # 0 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_01.png'), (200, 100)), # 1 dano
+            pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_02.png'), (200, 100))  # 2 danos
         ]
 
     def MenuInicial(self):
@@ -406,7 +406,7 @@ class Game:
                 player.emparalax()
 
             #PARALAX PARA A DIREITA
-            if (pygame.key.get_pressed()[K_d] and paralax == True):
+            if (pygame.key.get_pressed()[K_d] and paralax == True and self.estado == 'jogando'):
 
                 self.tela_x -= 8
                 
@@ -420,7 +420,7 @@ class Game:
                     ini.aplicar_paralax(-25)
 
             #PARALAX PARA A ESQUERDA
-            if (pygame.key.get_pressed()[K_a] and paralax == True):
+            if (pygame.key.get_pressed()[K_a] and paralax == True and self.estado == 'jogando'):
                 
                 self.tela_x += 8
 

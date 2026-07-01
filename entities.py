@@ -363,7 +363,8 @@ class Inimigo_Corpo_a_Corpo(Entidade):
                 sprite = self.sprites_vida[indice_sprite]
                 # Centraliza a barra acima do inimigo
                 pos_x = self.pos[0] + (self.colisao.width / 2) - (sprite.get_width() / 2)
-                pos_y = self.pos[1] - 60  
+                pos_y = self.pos[1] - 60 
+                
                 self.screen.blit(sprite, (pos_x, pos_y))
                 
     def aplicar_paralax(self, deslocamento):
