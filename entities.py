@@ -109,7 +109,7 @@ class Player(Entidade):
                 self.state = 'pulo duplo'
 
             #EVENTO DE DAR DASH
-            if event.key == pygame.K_p and self.cooldown_dash == 0 :
+            if event.key == pygame.K_p and self.cooldown_dash == 0 and self.desbloqueou_dash:
                 self.time_dash = cst.TEMPODASH
                 self.cooldown_dash = cst.COOLDOWN_DASH
                 self.state_antes_dash = self.state
@@ -149,7 +149,7 @@ class Player(Entidade):
 
         if self.state == 'atacando':
             self.animacao = self.ataque
-        elif self.state == 'dash':
+        elif self.state == 'dash' and self.desbloqueou_dash:
             self.animacao = self.dash
         elif self.state == 'andando':
             self.animacao = self.andando

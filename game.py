@@ -650,8 +650,8 @@ class Game:
 
     def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
 
-        self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (64, 64))
-        self.sprite_powerup_pulo_duplo.set_colorkey((0, 0, 0))
+        #Mudei o sprite do pulo duplo, e deixei o que estava antes como o dash
+        self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (74, 74))
         self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
 
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
@@ -772,6 +772,11 @@ class Game:
 
     def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
 
+        self.sprite_powerup_dash = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_dash.png'), (74, 74))
+        self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
+
+        self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
+
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
@@ -814,6 +819,12 @@ class Game:
 
                     player.processar_evento(event)
 
+            if player.colisao.colliderect(self.colisao_powerup):
+                player.desbloqueou_dash = True
+            
+            if player.desbloqueou_dash == False:
+                self.screen.blit(self.sprite_powerup_dash, (1000, 600))
+
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
                 player.atualizar_animacao()
@@ -834,6 +845,9 @@ class Game:
             #CONTADOR PARA NÃO TER ATAQUE INFINITO
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
+
+            if player.colisao.colliderect(self.colisao_voltar_corredor):
+                return self.CorredorInfinito(self.valor_salvo_tela_x)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
