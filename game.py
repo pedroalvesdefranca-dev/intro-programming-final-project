@@ -24,6 +24,7 @@ class Game:
         self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
         self.som_pegou_cracha = pygame.mixer.Sound('Assets/Sons/som_pegou_cracha.wav')
         self.som_pegou_cracha.set_volume(0.3)
+        self.som_moeda = pygame.mixer.Sound('Assets/Sons/som_moeda.wav')
 
         #DEFINE VARIÁVEIS INICIAIS
         self.tela_anterior = None
@@ -377,8 +378,7 @@ class Game:
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
                 self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                self.desenhar_game_over(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -640,8 +640,7 @@ class Game:
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
                 self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                self.desenhar_game_over(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -701,8 +700,9 @@ class Game:
                     player.processar_evento(event)
             
             #DESENHA OU NÃO O POWERUP
-            if player.colisao.colliderect(self.colisao_powerup):
+            if player.colisao.colliderect(self.colisao_powerup) and not player.desbloqueou_pulo_duplo :
                 player.desbloqueou_pulo_duplo = True
+                self.som_moeda.play()
             
             if player.desbloqueou_pulo_duplo == False:
                 self.screen.blit(self.sprite_powerup_pulo_duplo, (1000, 600))
@@ -765,8 +765,7 @@ class Game:
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
                 self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                self.desenhar_game_over(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -825,8 +824,10 @@ class Game:
                     player.processar_evento(event)
 
             #DESENHA OU NÃO O POWERUP
-            if player.colisao.colliderect(self.colisao_powerup):
+            if player.colisao.colliderect(self.colisao_powerup) and not player.desbloqueou_dash :
                 player.desbloqueou_dash = True
+                self.som_moeda.play()
+
             if player.desbloqueou_dash == False:
                 self.screen.blit(self.sprite_powerup_dash, (1000, 600))
 
@@ -888,8 +889,7 @@ class Game:
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
                 self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                self.desenhar_game_over(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -962,6 +962,8 @@ class Game:
                 player.especial += 1
                 self.colisao_carga1.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga1 = True
+                self.som_moeda.play()
+
             if self.coletou_carga1 == False:
                 self.screen.blit(self.sprite_especial_carga1, self.colisao_carga1)
             
@@ -969,6 +971,8 @@ class Game:
                 player.especial += 1
                 self.colisao_carga2.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga2 = True
+                self.som_moeda.play()
+
             if self.coletou_carga2 == False:
                 self.screen.blit(self.sprite_especial_carga2, self.colisao_carga2)
             
@@ -976,6 +980,8 @@ class Game:
                 player.especial += 1
                 self.colisao_carga3.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga3 = True
+                self.som_moeda.play()
+
             if self.coletou_carga3 == False:
                 self.screen.blit(self.sprite_especial_carga3, self.colisao_carga3)
 
@@ -1046,6 +1052,21 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
+    #Mensagem de game over
+    def desenhar_game_over(self, player):
+        self.screen.blit(self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255)), (400, 300))
+        if player.desbloqueou_pulo_duplo :
+            pulo_duplo_txt = "PULO DUPLO - Encontrado"
+        else :
+            pulo_duplo_txt = "PULO DUPLO - Não encontrado"
+        if player.desbloqueou_dash :
+            dash_txt = "DASH - Encontrado"
+        else :
+            dash_txt = "DASH - Não encontrado"
+        cargas_txt = f"CARGAS - {player.especial}"
+        self.screen.blit(self.fonte.render(pulo_duplo_txt, True, (255, 255, 255)), (400, 360))
+        self.screen.blit(self.fonte.render(dash_txt, True, (255, 255, 255)), (400, 420))
+        self.screen.blit(self.fonte.render(cargas_txt, True, (255, 255, 255)), (400, 480))
 
     def Reiniciar(self, player):
             player.pos = [100, 500]
