@@ -20,6 +20,29 @@ class Game:
         self.screen = pygame.display.set_mode((cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
 
+        #DEFINE SONS
+        self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
+        self.som_pegou_cracha = pygame.mixer.Sound('Assets/Sons/som_pegou_cracha.wav')
+        self.som_pegou_cracha.set_volume(0.3)
+
+        #DEFINE VARIÁVEIS INICIAIS
+        self.tela_anterior = None
+        self.tela_atual = None
+        self.tela_x = None
+        self.estado = 'jogando'
+
+        #DEFINE UMA FONTE
+        self.fonte = pygame.font.Font(None, 50)
+
+        #DEFINE UM CHÃO
+        self.plataformas = [
+            pygame.Rect(0, 700, 1800, 160)
+        ]
+
+        #OBJETOS PARA NÃO SAIR DA TELA
+        self.limite_esquerdo = pygame.Rect(-10, 0, 10, 800)
+        self.limite_direito = pygame.Rect(1360, 0, 10, 800)
+
         #DEFINE UM CONTADOR PARA AS MENSAGENS DO TUTORIAL
         self.contagem_tutorial = 0
 
@@ -38,42 +61,29 @@ class Game:
         #DEFINE UM CONTADOR DE FRAMES QUE SERÁ UTILIZADO PARA FAZER AS ANIMAÇÕES DE STEFAN
         self.contagem_frames_stefan = 0 
 
-        self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
-        self.som_pegou_cracha = pygame.mixer.Sound('Assets/Sons/som_pegou_cracha.wav')
-        self.som_pegou_cracha.set_volume(0.3)
-
-        #DEFINE VARIÁVEIS INICIAIS
-        self.tela_anterior = None
-        self.tela_atual = None
-        self.estado = 'jogando'
-
-        #DEFINE UMA FONTE
-        self.fonte = pygame.font.Font(None, 50)
-
-        #DEFINE UM CHÃO
-        self.plataformas = [
-            pygame.Rect(0, 700, 1800, 160)
-        ]
-
-        self.tela_x = None
-
         #IMAGEM DO MENU
         self.tela_menu = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-menu.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
-        #IMAGEM DA TELA 2 - TUTORIAL
+        #IMAGEM DA TELA 1 - TUTORIAL
         self.tela_tutorial = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela-Tutorial.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
         #IMAGEM DA TELA 2 - CORREDOR INFINITO
         self.tela_corredor_infinito = pygame.transform.scale(pygame.image.load('Assets/Cenários/Corredor-Infinito.png'), (7123, 800))
 
+        #IMAGEM DA TELA 3 - GRAD5
+        self.tela_grad5 = pygame.transform.scale(pygame.image.load('Assets/Cenários/grad5.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+
+        #IMAGEM DA TELA 4 - LABORATÓRIO DE HARDWARE
+        self.tela_labhardware = pygame.transform.scale(pygame.image.load('Assets/Cenários/LabHardware.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+        
+        #IMAGEM DA TELA 5 - LANFITEATRO
+        self.tela_anfiteatro = pygame.transform.scale(pygame.image.load('Assets/Cenários/Anfiteatro.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+
         #SPRITE DO CHÃO
         self.chao = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao.png'), (cst.SCREEN_WIDTH, 200))
 
-        #SPRITE DO CHÃO DA TELA 2
-        self.chao2 = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao_tela2.png'), (9000, 200))
-
-        #SPRITE DA CATRACA
-        self.catraca = pygame.transform.scale(pygame.image.load('Assets/Ambiente/catraca1.png'), (150, 150))
+        #SPRITE DO CHÃO DA SEGUNDA TELA
+        self.chao2 = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao_tela2.png'), (10400, 200))
 
         #SPRITE DO CRACHÁ
         self.cracha = [
@@ -85,6 +95,58 @@ class Game:
         pygame.transform.scale(pygame.image.load('Assets/Coletáveis/cracha_05.png'), (90, 90))
         ]
 
+        #SPRITE DOS BOTÕES C
+        self.animacoes_botao_C = [
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_00.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_01.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_02.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_03.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_04.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_05.png'), (128, 128))
+        ]
+
+        #SPRITE DA CABEÇA DE STEFAN
+        self.cabeca_stefan = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan1.png'), (140, 140)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan2.png'), (140, 140))
+        ]
+
+        #SPRITE DA SETA PARA BAIXO
+        self.seta_baixo = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_00.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_01.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_02.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_03.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_04.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_05.png'), (200, 200))
+            ]
+
+        #SPRITE DOS BOTÕES C
+        self.animacoes_botao_C = [
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_00.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_01.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_02.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_03.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_04.png'), (128, 128)),
+            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_05.png'), (128, 128))
+        ]
+
+        #SPRITE DA CABEÇA DE STEFAN
+        self.cabeca_stefan = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan1.png'), (140, 140)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/stefan2.png'), (140, 140))
+        ]
+
+        #SPRITE DA SETA PARA BAIXO
+        self.seta_baixo = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_00.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_01.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_02.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_03.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_04.png'), (200, 200)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/seta_baixo_05.png'), (200, 200))
+            ]
+
         # Sprites da barra de vida do inimigo
         self.sprites_vida_inimigo = [
             pygame.transform.scale(pygame.image.load('Assets/Inimigo/vida_inimigo_00.png'), (200, 100)), # 0 dano
@@ -95,6 +157,8 @@ class Game:
     def MenuInicial(self):
 
         while True:
+
+            #DESENHA A TELA DO MENU
             self.screen.blit(self.tela_menu, (0, 0))
             pygame.display.update()
 
@@ -111,37 +175,17 @@ class Game:
     def TelaTutorial(self):
 
         #DEFINE OS SPRITES QUE SERÃO UTILIZADOS NAS ANIMAÇÕES
-        animacoes_botao_C = [
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_00.png'), (128, 128)),
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_01.png'), (128, 128)),
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_02.png'), (128, 128)),
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_03.png'), (128, 128)),
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_04.png'), (128, 128)),
-            pygame.transform.scale(pygame.image.load('Assets/Sprite_botoes/botao_C_05.png'), (128, 128))
-        ]
-
         mensagens_tutorial = [
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_00.png'), (700, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_01.png'), (700, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_02.png'), (700, 256)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/tutorial_03.png'), (700, 256))
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_00.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_01.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_02.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_03.png'), (700, 210))
         ]
 
-        seta_baixo = [
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_00.png'), (200, 200)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_01.png'), (200, 200)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_02.png'), (200, 200)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_03.png'), (200, 200)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_04.png'), (200, 200)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/seta_baixo_05.png'), (200, 200))
-            ]
+        #SPRITE DA CATRACA
+        catraca = pygame.transform.scale(pygame.image.load('Assets/Ambiente/catraca1.png'), (150, 150))
         
-        cabeca_stefan = [
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/stefan1.png'), (140, 140)),
-            pygame.transform.scale(pygame.image.load('Assets/Tutorial/stefan2.png'), (140, 140))
-        ]
-
-        #OBJETO DE COLISÃO PARA A PRÓXIMA FASE
+        #OBJETO DE COLISÃO DA CATRACA
         transicao_1_2 = pygame.Rect(1100, 560, 150, 150)
 
         #OBJETO DO CRACHÁ
@@ -159,7 +203,7 @@ class Game:
             self.screen.blit(self.tela_tutorial, (0, 0))
 
             #DESENHA O OBJETO DE COLISÃO
-            self.screen.blit(self.catraca, (1100, 560))
+            self.screen.blit(catraca, (1100, 560))
 
             #DESENHA O CHÃO
             self.screen.blit(self.chao, (0, 710))
@@ -199,7 +243,7 @@ class Game:
                             #AVANÇA PARA A PRÓXIMA FASE CASO PASSE O CRACHÁ NA CATRACA
                             if (event.key == pygame.K_c) and (cracha_coletado == True):
                                 self.som_catraca_girando.play()
-                                return self.CorredorInfinito()
+                                return self.CorredorInfinito(0)
 
                     player.processar_evento(event)
 
@@ -207,7 +251,7 @@ class Game:
             self.contagem_frames_stefan += 0.1
 
             #FAZ UM LOOP NOS SPRITES DA CABEÇA DE STEFAN
-            if self.contagem_frames_stefan >= len(cabeca_stefan):
+            if self.contagem_frames_stefan >= len(self.cabeca_stefan):
                 self.contagem_frames_stefan = 0
 
             #INICIA AS MENSAGENS DO TUTORIAL
@@ -217,23 +261,23 @@ class Game:
                 self.contagem_frames_seta += 0.2
 
                 #FAZ UM LOOP NOS SPRITES DA SETA
-                if self.contagem_frames_seta >= len(seta_baixo):
+                if self.contagem_frames_seta >= len(self.seta_baixo):
                     self.contagem_frames_seta = 0
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
 
                 #DESENHA A PRIMEIRA MENSAGEM
                 self.screen.blit(mensagens_tutorial[0], (350, 35))
 
                 #DESENHA A SETA
-                self.screen.blit(seta_baixo[int(self.contagem_frames_seta)], (player.pos[0] - 45, player.pos[1] - 130))
+                self.screen.blit(self.seta_baixo[int(self.contagem_frames_seta)], (player.pos[0] - 45, player.pos[1] - 130))
 
             #SEGUNDA MENSAGEM
             if self.contagem_tutorial > 6 and self.contagem_tutorial < 12:
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
 
                 self.screen.blit(mensagens_tutorial[1], (350, 35))
 
@@ -241,7 +285,7 @@ class Game:
             if self.contagem_tutorial > 12 and self.contagem_tutorial < 18:
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
 
             
                 self.screen.blit(mensagens_tutorial[2], (350, 35))
@@ -258,14 +302,14 @@ class Game:
                     self.screen.blit(self.cracha[int(self.contagem_frames_cracha)], (950, 580))
 
                 self.contagem_frames_seta += 0.2
-                if self.contagem_frames_seta >= len(seta_baixo):
+                if self.contagem_frames_seta >= len(self.seta_baixo):
                     self.contagem_frames_seta = 0
 
                 #DESENHA A CABEÇA DE STEFAN
-                self.screen.blit(cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 145))
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
 
                 self.screen.blit(mensagens_tutorial[3], (350, 35))
-                self.screen.blit(seta_baixo[int(self.contagem_frames_seta)], (cracha_obj.x - 50, cracha_obj.y - 110))
+                self.screen.blit(self.seta_baixo[int(self.contagem_frames_seta)], (cracha_obj.x - 50, cracha_obj.y - 110))
 
                 #COLISÃO COM O CRACHÁ:
                 if (player.colisao.colliderect(cracha_obj)):
@@ -275,9 +319,9 @@ class Game:
 
             if (player.colisao.colliderect(transicao_1_2) and cracha_coletado):
                 self.contagem_frames_botoes += 0.3
-                if self.contagem_frames_botoes > len(animacoes_botao_C):
+                if self.contagem_frames_botoes > len(self.animacoes_botao_C):
                     self.contagem_frames_botoes = 0
-                self.screen.blit(animacoes_botao_C[int(self.contagem_frames_botoes)], (1120, 450))
+                self.screen.blit(self.animacoes_botao_C[int(self.contagem_frames_botoes)], (1120, 450))
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
@@ -314,6 +358,18 @@ class Game:
                     player.pulo_duplo = True
                     break
             
+            #COLISÃO COM O LIMITE ESQUERDO
+            if (player.colisao.left <= self.limite_esquerdo.right):
+                player.vel_x = 0
+                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.colisao.x = player.pos[0]
+
+            #COLISÃO COM O LIMITE DIREITO
+            if (player.colisao.right >= self.limite_direito.left):
+                player.vel_x = 0
+                player.pos[0] = self.limite_direito.left - 175
+                player.colisao.x = player.pos[0]
+
             #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
@@ -331,20 +387,26 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self):
+    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+        self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((50, 510), self.screen, 3, 0)
+        player = Player((50, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
 
         # Prepara a lista de inimigos e um timer para spawn
         lista_inimigos = []
         timer_spawn = 60 # Começa em 60 frames (1 segundo) para o primeiro inimigo aparecer
 
-        #OBJETO E VARIAVEL NECESSÁRIO PARA REALIZAR O PARALAX
+        #OBJETO E VARIAVEL NECESSÁRIOS PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
         paralax = False
 
-        self.tela_x = 0
+        #MENSAGENS DAS PORTAS
+        mensagem_porta1 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/gradmensagem.png'), (700, 210))
+        mensagem_porta2 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/labhardwaremensagem.png'), (700, 210))
+        mensagem_porta3 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/anfiteatromensagem.png'), (700, 210))
+
 
         while True:
 
@@ -375,6 +437,18 @@ class Game:
 
                     player.processar_evento(event)
 
+            #CRIANDO O OBJETO DAS PORTAS - ELES SE MOVEM CONFORME O PARALAX PARA CHEGAR AO PLAYER
+            porta1 = pygame.Rect(1317 + self.tela_x, 122, 300, 678)
+            porta2 = pygame.Rect(3684 + self.tela_x, 122, 300, 678)
+            porta3 = pygame.Rect(5835 + self.tela_x, 122, 300, 678)
+
+            #SOMADOR QUE FAZ A ANIMAÇÃO DE STEFAN
+            self.contagem_frames_stefan += 0.1
+
+            #FAZ UM LOOP NOS SPRITES DA CABEÇA DE STEFAN
+            if self.contagem_frames_stefan >= len(self.cabeca_stefan):
+                self.contagem_frames_stefan = 0
+
             self.screen.fill((0,0,0))
 
             #DESENHA NA TELA O CENÁRIO
@@ -394,7 +468,7 @@ class Game:
                 paralax = True
                 player.emparalax()
 
-            #DESAATIVA O PARALAX NO FIM DA TELA
+            #DESATIVA O PARALAX NO FIM DA TELA
             if (self.tela_x <= -5823 and paralax == True):
                 paralax = False
                 self.tela_x = -5823
@@ -438,7 +512,7 @@ class Game:
                 player.atualizar_animacao()
                 player.movimento()
                 
-                # --- LÓGICA DE SPAWN ALEATÓRIO ---
+                #LÓGICA DE SPAWN ALEATÓRIO
                 timer_spawn -= 1
                 if timer_spawn <= 0:
                     # Cria o inimigo fora da tela na direita (posição X: 1400)
@@ -498,8 +572,65 @@ class Game:
                     player.no_chao = True
                     player.pulo_duplo = True
                     break
-            
-            #DESENHA O JOGADOR e o inimigo
+
+            #PRIMEIRA PORTA
+            if (player.colisao.colliderect(porta1)):
+
+                #DESENHA A CABEÇA DE STEFAN
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
+
+                #DESENHA A PRIMEIRA MENSAGEM
+                self.screen.blit(mensagem_porta1, (350, 35))
+
+                if (pygame.key.get_pressed()[K_c]):
+                    player.semparalax(0)
+                    paralax = False
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.Grad5(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+
+            #SEGUNDA PORTA
+            if (player.colisao.colliderect(porta2)):
+
+                #DESENHA A CABEÇA DE STEFAN
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
+
+                #DESENHA A PRIMEIRA MENSAGEM
+                self.screen.blit(mensagem_porta2, (350, 35))
+
+                if (pygame.key.get_pressed()[K_c]):
+                    player.semparalax(0)
+                    paralax = False
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.LabHardware(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+
+            #TERCEIRA PORTA
+            if (player.colisao.colliderect(porta3)):   
+
+                #DESENHA A CABEÇA DE STEFAN
+                self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
+
+                #DESENHA A PRIMEIRA MENSAGEM
+                self.screen.blit(mensagem_porta3, (350, 35))
+
+                if (pygame.key.get_pressed()[K_c]):
+                    player.semparalax(0)
+                    paralax = False
+                    self.valor_salvo_tela_x = self.tela_x
+                    return self.Anfiteatro(player.vida, player.especial, player.desbloqueou_pulo_duplo)
+
+            #COLISÃO COM O LIMITE ESQUERDO
+            if (player.colisao.left <= self.limite_esquerdo.right):
+                player.vel_x = 0
+                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.colisao.x = player.pos[0]
+
+            #COLISÃO COM O LIMITE DIREITO
+            if (player.colisao.right >= self.limite_direito.left):
+                player.vel_x = 0
+                player.pos[0] = self.limite_direito.left - 175
+                player.colisao.x = player.pos[0]
+
+            #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
                 for ini in lista_inimigos:
@@ -516,6 +647,345 @@ class Game:
 
             #TICK NO RELÓGIO
             self.clock.tick(60)
+
+    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+
+        self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (64, 64))
+        self.sprite_powerup_pulo_duplo.set_colorkey((0, 0, 0))
+        self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
+
+        self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
+
+        #DEFINE O OBJETO DO PLAYER
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+
+        while True:
+
+            #DEFINE A TELA ATUAL
+            self.tela_atual == 'Grad5'
+
+            #DESENHA NA TELA O CENÁRIO
+            self.screen.blit(self.tela_grad5, (0, 0))
+
+            #DESENHA O CHÃO
+            self.screen.blit(self.chao, (0, 710))
+
+            #VERIFICA EVENTOS
+            for event in pygame.event.get():
+
+                #EVENTO DE SAÍDA
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                #JOGADOR MORREU
+                if self.estado == 'Game over':
+                        
+                        if event.type == pygame.KEYDOWN:
+
+                            #REINICIA O JOGO
+                            if event.key == pygame.K_r:
+                                self.reiniciar(player)
+
+                            #ENCERRA O JOGO
+                            if event.key == pygame.K_q:
+                                pygame.quit()
+                                sys.exit()
+
+                #JOGADOR VIVO
+                elif self.estado == 'jogando':
+
+                    player.processar_evento(event)
+            
+            if player.colisao.colliderect(self.colisao_powerup):
+                player.desbloqueou_pulo_duplo = True
+            
+            if player.desbloqueou_pulo_duplo == False:
+                self.screen.blit(self.sprite_powerup_pulo_duplo, (1000, 600))
+
+            #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
+            if self.estado == 'jogando':
+                player.atualizar_animacao()
+                player.movimento()
+
+            #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
+            if player.invulnerabilidade > 0:
+                player.invulnerabilidade -= 1
+
+            player.no_chao = False
+
+            #DESENHA A VIDA NA TELA
+            player.atualizar_vida()
+
+            #DESENHA A BARRA DE ESPECIAL
+            player.atualizar_especial()
+
+            #CONTADOR PARA NÃO TER ATAQUE INFINITO
+            if player.cooldown_atq > 0:
+                player.cooldown_atq -= 1
+            
+            if player.colisao.colliderect(self.colisao_voltar_corredor):
+                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo)
+
+            #VERIFICA A COLISÃO DO PERSONAGEM
+            for plataforma in self.plataformas:
+                pe_anterior = player.y_anterior + player.colisao.height
+                pe_atual = player.colisao.bottom
+
+                #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
+                if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
+                    player.vel_y = 0
+                    player.pos[1] = plataforma.top - player.colisao.height
+                    player.colisao.y = player.pos[1]
+                    player.no_chao = True
+                    player.pulo_duplo = True
+                    break
+
+            #COLISÃO COM O LIMITE ESQUERDO
+            if (player.colisao.left <= self.limite_esquerdo.right):
+                player.vel_x = 0
+                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.colisao.x = player.pos[0]
+
+            #COLISÃO COM O LIMITE DIREITO
+            if (player.colisao.right >= self.limite_direito.left):
+                player.vel_x = 0
+                player.pos[0] = self.limite_direito.left - 175
+                player.colisao.x = player.pos[0]
+            
+            #DESENHA O JOGADOR
+            if self.estado == 'jogando':
+                player.desenhar()
+
+            #VERIFICA SE O JOGADOR MORREU
+            if player.vida <= 0:
+                self.estado = 'Game over'
+                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
+                self.screen.blit(texto, (400, 300))
+
+            #ATUALIZA A TELA
+            pygame.display.update()
+
+            #TICK NO RELÓGIO
+            self.clock.tick(60)
+
+    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+
+        #DEFINE O OBJETO DO PLAYER
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+
+        while True:
+
+            #DEFINE A TELA ATUAL
+            self.tela_atual == 'LabHardware'
+
+            #DESENHA NA TELA O CENÁRIO
+            self.screen.blit(self.tela_labhardware, (0, 0))
+
+            #DESENHA O CHÃO
+            self.screen.blit(self.chao, (0, 710))
+
+            #VERIFICA EVENTOS
+            for event in pygame.event.get():
+
+                #EVENTO DE SAÍDA
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                #JOGADOR MORREU
+                if self.estado == 'Game over':
+                        
+                        if event.type == pygame.KEYDOWN:
+
+                            #REINICIA O JOGO
+                            if event.key == pygame.K_r:
+                                self.reiniciar(player)
+
+                            #ENCERRA O JOGO
+                            if event.key == pygame.K_q:
+                                pygame.quit()
+                                sys.exit()
+
+                #JOGADOR VIVO
+                elif self.estado == 'jogando':
+
+                    player.processar_evento(event)
+
+            #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
+            if self.estado == 'jogando':
+                player.atualizar_animacao()
+                player.movimento()
+
+            #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
+            if player.invulnerabilidade > 0:
+                player.invulnerabilidade -= 1
+
+            player.no_chao = False
+
+            #DESENHA A VIDA NA TELA
+            player.atualizar_vida()
+
+            #DESENHA A BARRA DE ESPECIAL
+            player.atualizar_especial()
+
+            #CONTADOR PARA NÃO TER ATAQUE INFINITO
+            if player.cooldown_atq > 0:
+                player.cooldown_atq -= 1
+
+            #VERIFICA A COLISÃO DO PERSONAGEM
+            for plataforma in self.plataformas:
+                pe_anterior = player.y_anterior + player.colisao.height
+                pe_atual = player.colisao.bottom
+
+                #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
+                if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
+                    player.vel_y = 0
+                    player.pos[1] = plataforma.top - player.colisao.height
+                    player.colisao.y = player.pos[1]
+                    player.no_chao = True
+                    player.pulo_duplo = True
+                    break
+
+            #COLISÃO COM O LIMITE ESQUERDO
+            if (player.colisao.left <= self.limite_esquerdo.right):
+                player.vel_x = 0
+                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.colisao.x = player.pos[0]
+
+            #COLISÃO COM O LIMITE DIREITO
+            if (player.colisao.right >= self.limite_direito.left):
+                player.vel_x = 0
+                player.pos[0] = self.limite_direito.left - 175
+                player.colisao.x = player.pos[0]
+            
+            #DESENHA O JOGADOR
+            if self.estado == 'jogando':
+                player.desenhar()
+
+            #VERIFICA SE O JOGADOR MORREU
+            if player.vida <= 0:
+                self.estado = 'Game over'
+                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
+                self.screen.blit(texto, (400, 300))
+
+            #ATUALIZA A TELA
+            pygame.display.update()
+
+            #TICK NO RELÓGIO
+            self.clock.tick(60)
+
+    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False):
+
+        #DEFINE O OBJETO DO PLAYER
+        player = Player((100, 510), self.screen, vida, especial)
+        player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
+
+        while True:
+
+            #DEFINE A TELA ATUAL
+            self.tela_atual == 'Anfiteatro'
+
+            #DESENHA NA TELA O CENÁRIO
+            self.screen.blit(self.tela_anfiteatro, (0, 0))
+
+            #DESENHA O CHÃO
+            self.screen.blit(self.chao, (0, 710))
+
+            #VERIFICA EVENTOS
+            for event in pygame.event.get():
+
+                #EVENTO DE SAÍDA
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                #JOGADOR MORREU
+                if self.estado == 'Game over':
+                        
+                        if event.type == pygame.KEYDOWN:
+
+                            #REINICIA O JOGO
+                            if event.key == pygame.K_r:
+                                self.reiniciar(player)
+
+                            #ENCERRA O JOGO
+                            if event.key == pygame.K_q:
+                                pygame.quit()
+                                sys.exit()
+
+                #JOGADOR VIVO
+                elif self.estado == 'jogando':
+
+                    player.processar_evento(event)
+
+            #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
+            if self.estado == 'jogando':
+                player.atualizar_animacao()
+                player.movimento()
+
+            #CONTADOR PARA O PLAYER NÃO LEVAR DANO INFINITO
+            if player.invulnerabilidade > 0:
+                player.invulnerabilidade -= 1
+
+            player.no_chao = False
+
+            #DESENHA A VIDA NA TELA
+            player.atualizar_vida()
+
+            #DESENHA A BARRA DE ESPECIAL
+            player.atualizar_especial()
+
+            #CONTADOR PARA NÃO TER ATAQUE INFINITO
+            if player.cooldown_atq > 0:
+                player.cooldown_atq -= 1
+
+            #VERIFICA A COLISÃO DO PERSONAGEM
+            for plataforma in self.plataformas:
+                pe_anterior = player.y_anterior + player.colisao.height
+                pe_atual = player.colisao.bottom
+
+                #VERIFICA SE O PLAYER ESTÁ EXATAMENTE EM CIMA DA PLATAFORMA
+                if player.colisao.right > plataforma.left and player.colisao.left < plataforma.right and pe_anterior <= plataforma.top and pe_atual >= plataforma.top and player.vel_y >= 0:
+                    player.vel_y = 0
+                    player.pos[1] = plataforma.top - player.colisao.height
+                    player.colisao.y = player.pos[1]
+                    player.no_chao = True
+                    player.pulo_duplo = True
+                    break
+            
+            #COLISÃO COM O LIMITE ESQUERDO
+            if (player.colisao.left <= self.limite_esquerdo.right):
+                player.vel_x = 0
+                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.colisao.x = player.pos[0]
+
+            #COLISÃO COM O LIMITE DIREITO
+            if (player.colisao.right >= self.limite_direito.left):
+                player.vel_x = 0
+                player.pos[0] = self.limite_direito.left - 175
+                player.colisao.x = player.pos[0]
+
+            #DESENHA O JOGADOR
+            if self.estado == 'jogando':
+                player.desenhar()
+                for ini in lista_inimigos:
+                    ini.desenhar()
+
+            #VERIFICA SE O JOGADOR MORREU
+            if player.vida <= 0:
+                self.estado = 'Game over'
+                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
+                self.screen.blit(texto, (400, 300))
+
+            #ATUALIZA A TELA
+            pygame.display.update()
+
+            #TICK NO RELÓGIO
+            self.clock.tick(60)
+
 
     def Reiniciar(self, player):
             player.pos = [100, 500]
