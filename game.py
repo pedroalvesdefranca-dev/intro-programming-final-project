@@ -22,8 +22,8 @@ class Game:
 
         #DEFINE SONS
         self.som_catraca_girando = pygame.mixer.Sound('Assets/Sons/som_catraca_girando.wav')
-        self.som_pegou_cracha = pygame.mixer.Sound('Assets/Sons/som_pegou_cracha.wav')
-        self.som_pegou_cracha.set_volume(0.3)
+        self.som_pegou_coletavel = pygame.mixer.Sound('Assets/Sons/som_pegou_coletavel.wav')
+        self.som_pegou_coletavel.set_volume(0.3)
 
         #DEFINE VARIÁVEIS INICIAIS
         self.tela_anterior = None
@@ -314,7 +314,7 @@ class Game:
                 #COLISÃO COM O CRACHÁ:
                 if (player.colisao.colliderect(cracha_obj)):
                     cracha_obj = None
-                    self.som_pegou_cracha.play()
+                    self.som_pegou_coletavel.play()
                     cracha_coletado = True
 
             if (player.colisao.colliderect(transicao_1_2) and cracha_coletado):
@@ -376,9 +376,7 @@ class Game:
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
-                self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                return self.Reiniciar(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -401,7 +399,7 @@ class Game:
 
         #OBJETO E VARIAVEL NECESSÁRIOS PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
-        paralax = False
+        self.paralax = False
 
         #MENSAGENS DAS PORTAS
         mensagem_porta1 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/gradmensagem.png'), (700, 210))
@@ -459,50 +457,50 @@ class Game:
             self.screen.blit(self.chao2, (self.tela_x, 710))
 
             #DESATIVA O PARALAX NO INÍCIO
-            if (self.tela_x >= 0 and paralax == True):
-                paralax = False
+            if (self.tela_x >= 0 and self.paralax == True):
+                self.paralax = False
                 self.tela_x = 0
                 player.semparalax(-8)
 
             #ATIVA O PARALAX NO INÍCIO
             if (player.colisao.right == obj_paralax.left):
-                paralax = True
+                self.paralax = True
                 player.emparalax()
 
             #DESATIVA O PARALAX NO FIM DA TELA
-            if (self.tela_x <= -5823 and paralax == True):
-                paralax = False
+            if (self.tela_x <= -5823 and self.paralax == True):
+                self.paralax = False
                 self.tela_x = -5823
                 player.semparalax(+8)
 
             #ATIVA O PARALAX NO FIM DA TELA
             if (player.colisao.colliderect(obj_paralax)):
-                paralax = True
+                self.paralax = True
                 player.emparalax()
 
             #PARALAX PARA A DIREITA
-            if (pygame.key.get_pressed()[K_d] and paralax == True and self.estado == 'jogando'):
+            if (pygame.key.get_pressed()[K_d] and self.paralax == True and self.estado == 'jogando'):
 
                 self.tela_x -= 8
                 
                 for ini in lista_inimigos:
                     ini.aplicar_paralax(-8)
 
-            if player.state == 'dash' and player.andando_direita and paralax == True:
+            if player.state == 'dash' and player.andando_direita and self.paralax == True:
                 self.tela_x -= 25
 
                 for ini in lista_inimigos:
                     ini.aplicar_paralax(-25)
 
             #PARALAX PARA A ESQUERDA
-            if (pygame.key.get_pressed()[K_a] and paralax == True and self.estado == 'jogando'):
+            if (pygame.key.get_pressed()[K_a] and self.paralax == True and self.estado == 'jogando'):
                 
                 self.tela_x += 8
 
                 for ini in lista_inimigos:
                     ini.aplicar_paralax(8)
 
-            if player.state == 'dash' and not player.andando_direita and paralax == True:
+            if player.state == 'dash' and not player.andando_direita and self.paralax == True:
                 self.tela_x += 25
 
                 for ini in lista_inimigos:
@@ -585,7 +583,7 @@ class Game:
 
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
-                    paralax = False
+                    self.paralax = False
                     self.valor_salvo_tela_x = self.tela_x
                     return self.Grad5(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
@@ -600,7 +598,7 @@ class Game:
 
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
-                    paralax = False
+                    self.paralax = False
                     self.valor_salvo_tela_x = self.tela_x
                     return self.LabHardware(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
@@ -615,7 +613,7 @@ class Game:
 
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
-                    paralax = False
+                    self.paralax = False
                     self.valor_salvo_tela_x = self.tela_x
                     return self.Anfiteatro(player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
 
@@ -639,9 +637,7 @@ class Game:
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
-                self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                return self.Reiniciar(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -702,6 +698,7 @@ class Game:
             
             #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup):
+                self.som_pegou_coletavel.play()
                 player.desbloqueou_pulo_duplo = True
             
             if player.desbloqueou_pulo_duplo == False:
@@ -764,9 +761,7 @@ class Game:
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
-                self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                return self.Reiniciar(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -826,7 +821,9 @@ class Game:
 
             #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup):
+                self.som_pegou_coletavel.play()
                 player.desbloqueou_dash = True
+
             if player.desbloqueou_dash == False:
                 self.screen.blit(self.sprite_powerup_dash, (1000, 600))
 
@@ -887,9 +884,7 @@ class Game:
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
-                self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                return self.Reiniciar(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -1036,9 +1031,7 @@ class Game:
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
-                self.estado = 'Game over'
-                texto = self.fonte.render("GAME OVER - Aperte R para reiniciar", True, (255, 255, 255))
-                self.screen.blit(texto, (400, 300))
+                return self.Reiniciar(player)
 
             #ATUALIZA A TELA
             pygame.display.update()
@@ -1048,20 +1041,38 @@ class Game:
 
 
     def Reiniciar(self, player):
+            self.tela_perdeu = pygame.transform.scale(pygame.image.load('Assets/Cenários/Tela_de_Derrota.png'), (1300, 800))
+
             player.pos = [100, 500]
             player.colisao.x = 100
             player.colisao.y = 500
+            self.estado = 'jogando'
+            self.paralax = False
 
             player.vida = 3
             player.especial = 0
-            player.desbloqueou_pulo_duplo=False
-            player.desbloqueou_dash=False
+            player.desbloqueou_pulo_duplo = False
+            player.desbloqueou_dash = False
             player.vel_x = 0
             player.vel_y = 0
-            player.contagem_moeda = 0
             player.invulnerabilidade = 0
+            player.semparalax(-8)
 
-            return self.CorredorInfinito(tela_x=0)
+            while True:
+
+                for event in pygame.event.get():
+
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            return self.CorredorInfinito(0, 3, 0, False, False)
+                
+                self.screen.blit(self.tela_perdeu, (0, 0))
+
+                pygame.display.update()
 
 game = Game()
 game.MenuInicial()

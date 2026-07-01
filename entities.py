@@ -23,6 +23,7 @@ class Player(Entidade):
         self.especial = especial
         self.invulnerabilidade = 0
 
+
         self.screen = screen
 
         self.colisao = pygame.Rect(pos[0], pos[1], 160, 170)
@@ -45,6 +46,8 @@ class Player(Entidade):
 
         self.andando_direita = True
         self.no_chao = False
+
+        self.y_anterior = 700
 
         self.vel_x = 0
         self.vel_y = 0
@@ -299,7 +302,6 @@ class Player(Entidade):
         cst.VEL_PERSONAGEM = self.velocidade_antes_paralax
         cst.VELDASH = self.dash_antes_paralax
         self.pos[0] += empulso
-
 class Inimigo_Corpo_a_Corpo(Entidade):
     def __init__(self, pos, screen, sprites_vida):
         super().__init__(pos)
