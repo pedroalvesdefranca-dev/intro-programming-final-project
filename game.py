@@ -209,7 +209,7 @@ class Game:
                             #AVANÇA PARA A PRÓXIMA FASE CASO PASSE O CRACHÁ NA CATRACA
                             if (event.key == pygame.K_c) and (cracha_coletado == True):
                                 self.som_catraca_girando.play()
-                                return self.CorredorInfinito()
+                                return self.CorredorInfinito(0)
 
                     player.processar_evento(event)
 
@@ -353,7 +353,8 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self):
+    def CorredorInfinito(self, tela_x):
+        self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((50, 510), self.screen, 3, 0)
@@ -361,7 +362,6 @@ class Game:
         #OBJETO E VARIAVEL NECESSÁRIOS PARA REALIZAR O PARALAX
         obj_paralax = pygame.Rect(650, 0, 1, 900)
         paralax = False
-        self.tela_x = 0
 
         #MENSAGENS DAS PORTAS
         mensagem_porta1 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/gradmensagem.png'), (700, 210))
@@ -502,8 +502,9 @@ class Game:
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
                     paralax = False
+                    self.valor_salvo_tela_x = tela_x
                     return self.Grad5()
-               
+
             #SEGUNDA PORTA
             if (player.colisao.colliderect(porta2)):
 
@@ -516,6 +517,7 @@ class Game:
                 if (pygame.key.get_pressed()[K_c]):
                     player.semparalax(0)
                     paralax = False
+                    self.valor_salvo_tela_x = tela_x
                     return self.LabHardware()
 
             #TERCEIRA PORTA
@@ -562,6 +564,12 @@ class Game:
 
     def Grad5(self):
 
+        self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (64, 64))
+        self.sprite_powerup_pulo_duplo.set_colorkey((0, 0, 0))
+        self.colisao_powerup = pygame.Rect(1000, 600, 64, 64)
+
+        self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
+
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, 3, 0)
 
@@ -602,6 +610,12 @@ class Game:
                 elif self.estado == 'jogando':
 
                     player.processar_evento(event)
+            
+            if player.colisao.colliderect(self.colisao_powerup):
+                player.desbloqueou_pulo_duplo = True
+            
+            if player.desbloqueou_pulo_duplo == False:
+                self.screen.blit(self.sprite_powerup_pulo_duplo, (1000, 600))
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
             if self.estado == 'jogando':
@@ -623,6 +637,9 @@ class Game:
             #CONTADOR PARA NÃO TER ATAQUE INFINITO
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
+            
+            if player.colisao.colliderect(self.colisao_voltar_corredor):
+                return self.CorredorInfinito(self.valor_salvo_tela_x)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
