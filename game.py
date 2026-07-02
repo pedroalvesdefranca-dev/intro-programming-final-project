@@ -83,6 +83,9 @@ class Game:
         #IMAGEM DA TELA 5 - LANFITEATRO
         self.tela_anfiteatro = pygame.transform.scale(pygame.image.load('Assets/Cenários/Anfiteatro.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
+        #IMAGEM DA TELA 6 - CRÉDITOS
+        self.tela_creditos = pygame.transform.scale(pygame.image.load('Assets/Cenários/Creditos.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+
         #SPRITE DO CHÃO
         self.chao = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao.png'), (cst.SCREEN_WIDTH, 200))
 
@@ -161,8 +164,6 @@ class Game:
     def MenuInicial(self):
 
         while True:
-
-            return self.Anfiteatro()
 
             #DESENHA A TELA DO MENU
             self.screen.blit(self.tela_menu, (0, 0))
@@ -1084,7 +1085,7 @@ class Game:
                     self.screen.blit(mensagens_boss[3], (350, 35))
 
                 #SPAWN DO BOSS
-                if contagem_boss > 4:
+                if contagem_boss > 34:
 
                     if boss_morto == False:
 
@@ -1118,6 +1119,7 @@ class Game:
                         # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
                         if boss.vida <= 0:
                             boss_morto = True
+                            return self.Creditos()
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -1161,6 +1163,24 @@ class Game:
 
             #TICK NO RELÓGIO
             self.clock.tick(60)
+
+    def Creditos(self):
+
+            while True:
+
+                #DEFINE A TELA ATUAL
+                self.tela_atual == 'Créditos'
+
+                #DESENHA NA TELA O CENÁRIO
+                self.screen.blit(self.tela_creditos, (0, 0))
+
+                for event in pygame.event.get():
+
+                    if event.type == QUIT:
+                        pygame.quit()
+                        exit()
+
+                pygame.display.update()
 
     #Mensagem de game over
     def desenhar_game_over(self, player):

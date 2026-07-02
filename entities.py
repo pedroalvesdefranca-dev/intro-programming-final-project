@@ -529,7 +529,7 @@ class Boss(Entidade):
         ]
 
         #DEFINE OS SPRITES DO INIMIGO ATACANDO
-        self.sprite_atacando = pygame.transform.scale(pygame.image.load('Assets/Inimigo/inimigo-atacando.png'), (280, 230))
+        self.sprite_atacando = pygame.transform.scale(pygame.image.load('Assets/Boss/boss_atacando.png'), (260, 340))
 
     def atualizar(self, player, plataformas):
         # Se a vida for 0, ele morre e não faz mais nada
@@ -646,7 +646,7 @@ class Boss(Entidade):
                 pos_y = self.pos[1] + 13
 
                 if self.atacando == True:
-                    self.screen.blit(self.sprite_atual, (pos_x, pos_y - 20))
+                    self.screen.blit(self.sprite_atual, (pos_x, pos_y - 160))
 
                 else:
                     self.screen.blit(self.sprite_atual, (pos_x, pos_y - 100))
