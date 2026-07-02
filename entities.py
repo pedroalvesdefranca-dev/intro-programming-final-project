@@ -16,12 +16,13 @@ class Entidade:
 
 class Player(Entidade):
 
-    def __init__(self, pos, screen, vida, especial):
+    def __init__(self, pos, screen, vida, especial, cargas_coletadas):
         super().__init__(pos)
 
         self.vida = vida
         self.especial = especial
         self.invulnerabilidade = 0
+        self.cargas_coletadas = cargas_coletadas
 
 
         self.screen = screen
@@ -257,12 +258,12 @@ class Player(Entidade):
 
         #DEFINE A COLISÃO DO ATAQUE PARA A DIREITA
         if self.andando_direita:
-            self.hitbox_atq = pygame.Rect(self.pos[0] + 100, altura_soco, 125, 64)
+            self.hitbox_atq = pygame.Rect(self.pos[0] + 90, altura_soco, 125, 64)
 
         #DEFINE A COLISÃO DO ATAQUE PARA A ESQUERDA
         else:
             #Empurra a hitbox mais para a esquerda para acompanhar o soco
-            self.hitbox_atq = pygame.Rect(self.pos[0] - 125, altura_soco, 125, 64)
+            self.hitbox_atq = pygame.Rect(self.pos[0] - 115, altura_soco, 125, 64)
 
     def soltar_especial(self):
         self.especial_ativo = True
@@ -349,8 +350,8 @@ class Player(Entidade):
         self.screen.blit(frame, pos_desenho)
         
         #testar a hitbox
-        if self.hitbox_atq is not None:
-            pygame.draw.rect(self.screen, (255, 0, 0), self.hitbox_atq, 2)
+        #if self.hitbox_atq is not None:
+            #pygame.draw.rect(self.screen, (255, 0, 0), self.hitbox_atq, 2)
 
     def emparalax(self):
 

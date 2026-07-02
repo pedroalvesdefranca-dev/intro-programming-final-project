@@ -198,7 +198,7 @@ class Game:
         cracha_coletado = False
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, 3, 0)
+        player = Player((100, 510), self.screen, 3, 0, 0)
 
         while True:
 
@@ -391,11 +391,11 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False, cargas_coletadas=0):
         self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((50, 510), self.screen, vida, especial)
+        player = Player((50, 510), self.screen, vida, especial, cargas_coletadas)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
         player.desbloqueou_dash = desbloqueou_dash
 
@@ -662,7 +662,7 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False, cargas_coletadas=0):
         msg_grad05 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_grad05.png'), (700, 210))
 
         #Mudei o sprite do pulo duplo, e deixei o que estava antes como o dash
@@ -672,7 +672,7 @@ class Game:
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, vida, especial)
+        player = Player((100, 510), self.screen, vida, especial, cargas_coletadas)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
         player.desbloqueou_dash = desbloqueou_dash
 
@@ -800,7 +800,7 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False, cargas_coletadas=0):
         msg_labhardware = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_labhardware.png'), (700, 210))
 
         self.sprite_powerup_dash = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_dash.png'), (74, 74))
@@ -809,7 +809,7 @@ class Game:
         self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, vida, especial)
+        player = Player((100, 510), self.screen, vida, especial, cargas_coletadas)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
         player.desbloqueou_dash = desbloqueou_dash
 
@@ -937,7 +937,7 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False, cargas_coletadas=0):
         msg_anfiteatro = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_anfiteatro.png'), (700, 210))
 
         self.sprite_especial_carga1 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
@@ -976,7 +976,7 @@ class Game:
         ]
 
         #DEFINE O OBJETO DO PLAYER
-        player = Player((100, 510), self.screen, vida, especial)
+        player = Player((100, 510), self.screen, vida, especial, cargas_coletadas)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
         player.desbloqueou_dash = desbloqueou_dash
 
@@ -1025,6 +1025,7 @@ class Game:
 
             #DESENHA OU NÃO AS CARGAS
             if player.colisao.colliderect(self.colisao_carga1):
+                player.cargas_coletadas += 1
                 player.especial += 1
                 self.colisao_carga1.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga1 = True
@@ -1034,6 +1035,7 @@ class Game:
                 self.screen.blit(self.sprite_especial_carga1, self.colisao_carga1)
             
             if player.colisao.colliderect(self.colisao_carga2):
+                player.cargas_coletadas += 1
                 player.especial += 1
                 self.colisao_carga2.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga2 = True
@@ -1043,6 +1045,7 @@ class Game:
                 self.screen.blit(self.sprite_especial_carga2, self.colisao_carga2)
             
             if player.colisao.colliderect(self.colisao_carga3):
+                player.cargas_coletadas += 1
                 player.especial += 1
                 self.colisao_carga3.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga3 = True
@@ -1168,7 +1171,7 @@ class Game:
                         # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
                         if boss.vida <= 0:
                             boss_morto = True
-                            return self.Creditos()
+                            return self.Creditos(player)
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -1213,7 +1216,7 @@ class Game:
             #TICK NO RELÓGIO
             self.clock.tick(60)
 
-    def Creditos(self):
+    def Creditos(self, player):
 
             while True:
 
@@ -1223,6 +1226,9 @@ class Game:
                 #DESENHA NA TELA O CENÁRIO
                 self.screen.blit(self.tela_creditos, (0, 0))
 
+                #Desenha o relatório
+                self.desenhar_creditos(player)
+
                 for event in pygame.event.get():
 
                     if event.type == QUIT:
@@ -1230,6 +1236,21 @@ class Game:
                         exit()
 
                 pygame.display.update()
+
+     #Mensagem de game over
+    def desenhar_creditos(self, player):
+        if player.desbloqueou_pulo_duplo :
+            pulo_duplo_txt = "PULO DUPLO - Encontrado"
+        else :
+            pulo_duplo_txt = "PULO DUPLO - Não encontrado"
+        if player.desbloqueou_dash :
+            dash_txt = "DASH - Encontrado"
+        else :
+            dash_txt = "DASH - Não encontrado"
+        cargas_txt = f"CARGAS - {player.cargas_coletadas}"
+        self.screen.blit(self.fonte.render(pulo_duplo_txt, True, (255, 255, 255)), (650, 580))
+        self.screen.blit(self.fonte.render(dash_txt, True, (255, 255, 255)), (650, 640))
+        self.screen.blit(self.fonte.render(cargas_txt, True, (255, 255, 255)), (650, 700))           
 
     #Mensagem de game over
     def desenhar_game_over(self, player):
@@ -1241,10 +1262,10 @@ class Game:
             dash_txt = "DASH - Encontrado"
         else :
             dash_txt = "DASH - Não encontrado"
-        cargas_txt = f"CARGAS - {player.especial}"
-        self.screen.blit(self.fonte.render(pulo_duplo_txt, True, (255, 255, 255)), (400, 360))
-        self.screen.blit(self.fonte.render(dash_txt, True, (255, 255, 255)), (400, 420))
-        self.screen.blit(self.fonte.render(cargas_txt, True, (255, 255, 255)), (400, 480))
+        cargas_txt = f"CARGAS - {player.cargas_coletadas}"
+        self.screen.blit(self.fonte.render(pulo_duplo_txt, True, (255, 255, 255)), (400, 380))
+        self.screen.blit(self.fonte.render(dash_txt, True, (255, 255, 255)), (400, 440))
+        self.screen.blit(self.fonte.render(cargas_txt, True, (255, 255, 255)), (400, 500))
 
     def Reiniciar(self, player):
             # Carrega a imagem da tela de derrota
