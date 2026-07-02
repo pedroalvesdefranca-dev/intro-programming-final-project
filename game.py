@@ -943,14 +943,18 @@ class Game:
         self.sprite_especial_carga1 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
         self.colisao_carga1 = self.sprite_especial_carga1.get_rect(topleft = (900, 600))
         self.coletou_carga1 = False
+        self.timer_carga1 = 0
 
         self.sprite_especial_carga2 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
         self.colisao_carga2 = self.sprite_especial_carga2.get_rect(topleft = (1000, 600))
         self.coletou_carga2 = False
+        self.timer_carga2 = 0
 
         self.sprite_especial_carga3 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
         self.colisao_carga3 = self.sprite_especial_carga3.get_rect(topleft = (1100, 600))
         self.coletou_carga3 = False
+        self.timer_carga3 = 0
+        self.tutorial_concluido = False  # Vira true depois que pega a primeira carga 3
 
         #VARIÁVEIS QUE CRIAM AS MENSAGENS DO BOSS
         contagem_frames_humberto = 0
@@ -1029,9 +1033,15 @@ class Game:
                 player.especial += 1
                 self.colisao_carga1.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga1 = True
+                self.timer_carga1 = random.randint(180, 360) #Respawn da carga
                 self.som_pegou_coletavel.play()
 
-            if self.coletou_carga1 == False:
+            if self.coletou_carga1: #Se já pegou, começa o tempo de respawn
+                self.timer_carga1 -= 1
+                if self.timer_carga1 <= 0:
+                    self.colisao_carga1.topleft = (900, 600) #A carga sai do chão e colta pra cima
+                    self.coletou_carga1 = False
+            else:
                 self.screen.blit(self.sprite_especial_carga1, self.colisao_carga1)
             
             if player.colisao.colliderect(self.colisao_carga2):
@@ -1039,9 +1049,15 @@ class Game:
                 player.especial += 1
                 self.colisao_carga2.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga2 = True
+                self.timer_carga2 = random.randint(180, 360)
                 self.som_pegou_coletavel.play()
 
-            if self.coletou_carga2 == False:
+            if self.coletou_carga2:
+                self.timer_carga2 -= 1
+                if self.timer_carga2 <= 0:
+                    self.colisao_carga2.topleft = (1000, 600)
+                    self.coletou_carga2 = False
+            else:
                 self.screen.blit(self.sprite_especial_carga2, self.colisao_carga2)
             
             if player.colisao.colliderect(self.colisao_carga3):
@@ -1049,9 +1065,16 @@ class Game:
                 player.especial += 1
                 self.colisao_carga3.top = 700 #Deixa o retângulo da carga abaixo do chão, impedindo mais de uma colisão
                 self.coletou_carga3 = True
+                self.tutorial_concluido = True
+                self.timer_carga3 = random.randint(180, 360)
                 self.som_pegou_coletavel.play()
 
-            if self.coletou_carga3 == False:
+            if self.coletou_carga3:
+                self.timer_carga3 -= 1
+                if self.timer_carga3 <= 0:
+                    self.colisao_carga3.topleft = (1100, 600) 
+                    self.coletou_carga3 = False
+            else:
                 self.screen.blit(self.sprite_especial_carga3, self.colisao_carga3)
 
             #ATUALIZA A ANIMAÇÃO CONFORME O EVENTO
@@ -1076,7 +1099,7 @@ class Game:
                 player.cooldown_atq -= 1
 
             #DESENHA O TUTORIAL DESTA SALA
-            if (self.coletou_carga3 == False):
+            if not self.tutorial_concluido :
                 #DESENHA A MENSAGEM DE TUTORIAL
                 self.screen.blit(msg_anfiteatro, (350, 35))
 
@@ -1091,7 +1114,7 @@ class Game:
                 self.screen.blit(self.cabeca_stefan[int(self.contagem_frames_stefan)], (1040, 106))
 
             #VERIFICA SE TODAS AS CARGA FORAM COLETADAS
-            if (self.coletou_carga3 == True):
+            if self.tutorial_concluido:
                 
                 contagem_boss += 0.05
 
