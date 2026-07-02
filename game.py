@@ -4,7 +4,7 @@ import random
 from pygame.locals import *
 import sys
 import constantes as cst
-from entities import Player, Inimigo_Corpo_a_Corpo
+from entities import Player, Inimigo_Corpo_a_Corpo, Boss
 
 #INICIA O PYGAME
 pygame.init()
@@ -82,6 +82,9 @@ class Game:
         
         #IMAGEM DA TELA 5 - LANFITEATRO
         self.tela_anfiteatro = pygame.transform.scale(pygame.image.load('Assets/Cenários/Anfiteatro.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
+
+        #IMAGEM DA TELA 6 - CRÉDITOS
+        self.tela_creditos = pygame.transform.scale(pygame.image.load('Assets/Cenários/Creditos.png'), (cst.SCREEN_WIDTH, cst.SCREEN_HEIGHT))
 
         #SPRITE DO CHÃO
         self.chao = pygame.transform.scale(pygame.image.load('Assets/Ambiente/chao.png'), (cst.SCREEN_WIDTH, 200))
@@ -364,13 +367,13 @@ class Game:
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
                 player.vel_x = 0
-                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.pos[0] = 0
                 player.colisao.x = player.pos[0]
 
             #COLISÃO COM O LIMITE DIREITO
             if (player.colisao.right >= self.limite_direito.left):
                 player.vel_x = 0
-                player.pos[0] = self.limite_direito.left - player.colisao.right
+                player.pos[0] = 1200
                 player.colisao.x = player.pos[0]
 
             #DESENHA O JOGADOR
@@ -634,13 +637,13 @@ class Game:
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
                 player.vel_x = 0
-                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.pos[0] = 0
                 player.colisao.x = player.pos[0]
 
             #COLISÃO COM O LIMITE DIREITO
             if (player.colisao.right >= self.limite_direito.left):
                 player.vel_x = 0
-                player.pos[0] = self.limite_direito.left - 175
+                player.pos[0] = 1200
                 player.colisao.x = player.pos[0]
 
             #DESENHA O JOGADOR
@@ -764,13 +767,13 @@ class Game:
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
                 player.vel_x = 0
-                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.pos[0] = 0
                 player.colisao.x = player.pos[0]
 
             #COLISÃO COM O LIMITE DIREITO
             if (player.colisao.right >= self.limite_direito.left):
                 player.vel_x = 0
-                player.pos[0] = self.limite_direito.left - 175
+                player.pos[0] = 1200
                 player.colisao.x = player.pos[0]
             
             #DESENHA O JOGADOR
@@ -891,13 +894,13 @@ class Game:
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
                 player.vel_x = 0
-                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.pos[0] = 0
                 player.colisao.x = player.pos[0]
 
             #COLISÃO COM O LIMITE DIREITO
             if (player.colisao.right >= self.limite_direito.left):
                 player.vel_x = 0
-                player.pos[0] = self.limite_direito.left - 175
+                player.pos[0] = 1200
                 player.colisao.x = player.pos[0]
             
             #DESENHA O JOGADOR
@@ -929,12 +932,37 @@ class Game:
         self.colisao_carga3 = self.sprite_especial_carga3.get_rect(topleft = (1100, 600))
         self.coletou_carga3 = False
 
-        self.colisao_voltar_corredor = pygame.Rect(1290, 500, 100, 100)
+        #VARIÁVEIS QUE CRIAM AS MENSAGENS DO BOSS
+        contagem_frames_humberto = 0
+        contagem_boss = 0
+
+        #SPRITE DA CABEÇA DE HUMBERTO
+        cabeca_humberto = [
+            pygame.transform.flip(pygame.transform.scale(pygame.image.load('Assets/Mensagens/humberto.png'), (150, 150)), True, False),
+            pygame.transform.flip(pygame.transform.scale(pygame.image.load('Assets/Mensagens/humberto2.png'), (150, 150)), True, False)
+
+        ]
+
+        #SPRITE DA CABEÇA DA VIRGINIANA
+        cabeca_virginiana = pygame.transform.flip(pygame.transform.scale(pygame.image.load('Assets/Mensagens/virginiana.png'), (130, 130)), True, False)
+
+
+        #MENSAGENS
+        mensagens_boss = [
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/boss1.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/boss2.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/boss3.png'), (700, 210)),
+            pygame.transform.scale(pygame.image.load('Assets/Mensagens/boss4.png'), (700, 210))
+        ]
 
         #DEFINE O OBJETO DO PLAYER
         player = Player((100, 510), self.screen, vida, especial)
         player.desbloqueou_pulo_duplo = desbloqueou_pulo_duplo
         player.desbloqueou_dash = desbloqueou_dash
+
+        #VERIFICA SE O BOSS ESTÁ VIVO
+        boss_morto = False
+        boss_spawnou = False
 
         while True:
 
@@ -1027,9 +1055,88 @@ class Game:
             if player.cooldown_atq > 0:
                 player.cooldown_atq -= 1
 
-            #VOLTA PARA O CORREDOR INFINITO
-            if player.colisao.colliderect(self.colisao_voltar_corredor):
-                return self.CorredorInfinito(self.valor_salvo_tela_x, player.vida, player.especial, player.desbloqueou_pulo_duplo, player.desbloqueou_dash)
+            #VERIFICA SE TODAS AS CARGA FORAM COLETADAS
+            if (self.coletou_carga3 == True):
+                
+                contagem_boss += 0.05
+
+                #SOMADOR QUE FAZ A ANIMAÇÃO DE HUMBERTO
+                contagem_frames_humberto += 0.1
+
+                #FAZ UM LOOP NOS SPRITES DA CABEÇA DE HUMBERTO
+                if contagem_frames_humberto >= len(cabeca_humberto):
+                    contagem_frames_humberto = 0
+
+                #INICIA AS MENSAGENS DO BOSS
+                if contagem_boss > 2 and contagem_boss < 10:
+
+                    #DESENHA A CABEÇA DE VIRGINIANA
+                    self.screen.blit(cabeca_virginiana, (1060, 112))
+                    
+                    #DESENHA A PRIMEIRA MENSAGEM
+                    self.screen.blit(mensagens_boss[0], (350, 35))
+
+
+                #SEGUNDA MENSAGEM
+                if contagem_boss > 10 and contagem_boss < 18:
+
+                    #DESENHA A CABEÇA DE HUMBERTO
+                    self.screen.blit(cabeca_humberto[int(contagem_frames_humberto)], (1040, 100))
+
+                    self.screen.blit(mensagens_boss[1], (350, 35))
+
+                #TERCEIRA MENSAGEM
+                if contagem_boss > 18 and contagem_boss < 26:
+
+                    #DESENHA A CABEÇA DE VIRGINIANA
+                    self.screen.blit(cabeca_virginiana, (1060, 112))
+                
+                    self.screen.blit(mensagens_boss[2], (350, 35))
+
+                #QUARTA MENSAGEM
+                if contagem_boss > 26 and contagem_boss < 34:
+
+                    #DESENHA A CABEÇA DE HUMBERTO
+                    self.screen.blit(cabeca_humberto[int(contagem_frames_humberto)], (1040, 100))
+                
+                    self.screen.blit(mensagens_boss[3], (350, 35))
+
+                #SPAWN DO BOSS
+                if contagem_boss > 34:
+
+                    if boss_morto == False:
+
+                        #SPAWNA O BOSS APENAS UMA VEZ
+                        if boss_spawnou == False:
+
+                            #DEFINE A BOSS
+                            boss = Boss([1000, 530], self.screen, self.sprites_vida_inimigo)
+                            boss_spawnou = True
+
+                        boss.atualizar(player, self.plataformas)
+
+                        # Verifica se o soco do player acertou este inimigo
+                        if player.hitbox_atq is not None and boss.vida > 0 and boss.invulnerabilidade == 0:
+                            if player.hitbox_atq.colliderect(boss.colisao):
+                                boss.vida -= 1
+                                boss.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
+                                boss.tomoudano = True
+                        
+                        # Verifica se este inimigo encostou no player
+                        if boss.vida > 0 and player.invulnerabilidade == 0:
+                            if boss.colisao.colliderect(player.colisao):
+                                player.vida -= 1
+                                player.invulnerabilidade = cst.INVULNERAVEL
+                                player.som_dano.play()
+
+                                #MODIFICA O SPRITE DO INIMIGO
+                                boss.atacando = True
+                                boss.atacou = True
+                        
+                        # Remove o inimigo da lista se ele morrer (Limpa a memória do jogo!)
+                        if boss.vida <= 0:
+                            boss_morto = True
+                            return self.Creditos()
 
             #VERIFICA A COLISÃO DO PERSONAGEM
             for plataforma in self.plataformas:
@@ -1048,18 +1155,21 @@ class Game:
             #COLISÃO COM O LIMITE ESQUERDO
             if (player.colisao.left <= self.limite_esquerdo.right):
                 player.vel_x = 0
-                player.pos[0] = self.limite_esquerdo.right - player.colisao.left
+                player.pos[0] = 0
                 player.colisao.x = player.pos[0]
 
             #COLISÃO COM O LIMITE DIREITO
             if (player.colisao.right >= self.limite_direito.left):
                 player.vel_x = 0
-                player.pos[0] = self.limite_direito.left - 175
+                player.pos[0] = 1200
                 player.colisao.x = player.pos[0]
 
             #DESENHA O JOGADOR
             if self.estado == 'jogando':
                 player.desenhar()
+
+                if (boss_spawnou):
+                    boss.desenhar()
 
             #VERIFICA SE O JOGADOR MORREU
             if player.vida <= 0:
@@ -1070,6 +1180,24 @@ class Game:
 
             #TICK NO RELÓGIO
             self.clock.tick(60)
+
+    def Creditos(self):
+
+            while True:
+
+                #DEFINE A TELA ATUAL
+                self.tela_atual == 'Créditos'
+
+                #DESENHA NA TELA O CENÁRIO
+                self.screen.blit(self.tela_creditos, (0, 0))
+
+                for event in pygame.event.get():
+
+                    if event.type == QUIT:
+                        pygame.quit()
+                        exit()
+
+                pygame.display.update()
 
     #Mensagem de game over
     def desenhar_game_over(self, player):
