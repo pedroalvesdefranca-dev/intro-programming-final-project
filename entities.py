@@ -329,7 +329,7 @@ class Player(Entidade):
             self.screen.blit(self.projetil_especial, self.hitbox_atq_especial)
             self.hitbox_atq_especial.x += self.vel_projetil
             self.distancia_especial += self.vel_projetil
-            if abs(self.distancia_especial) >= 700:
+            if abs(self.distancia_especial) >= 1300:
                 self.hitbox_atq_especial = None
                 self.especial_ativo = False
                 self.distancia_especial = 0

@@ -161,7 +161,6 @@ class Game:
     def MenuInicial(self):
 
         while True:
-
             #DESENHA A TELA DO MENU
             self.screen.blit(self.tela_menu, (0, 0))
             pygame.display.update()
@@ -389,7 +388,7 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self, tela_x, vida=3, especial=3, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
         self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
@@ -661,6 +660,7 @@ class Game:
             self.clock.tick(60)
 
     def Grad5(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+        msg_grad05 = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_grad05.png'), (700, 210))
 
         #Mudei o sprite do pulo duplo, e deixei o que estava antes como o dash
         self.sprite_powerup_pulo_duplo = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_pulo_duplo.png'), (74, 74))
@@ -710,6 +710,9 @@ class Game:
                 elif self.estado == 'jogando':
 
                     player.processar_evento(event)
+            
+            #DESENHA A MENSAGEM DE TUTORIAL
+            self.screen.blit(msg_grad05, (350, 35))
             
             #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup) and not player.desbloqueou_pulo_duplo :
@@ -785,6 +788,7 @@ class Game:
             self.clock.tick(60)
 
     def LabHardware(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+        msg_labhardware = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_labhardware.png'), (700, 210))
 
         self.sprite_powerup_dash = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/powerup_dash.png'), (74, 74))
         self.colisao_powerup = pygame.Rect(1000, 600, 74, 74)
@@ -833,6 +837,9 @@ class Game:
                 elif self.estado == 'jogando':
 
                     player.processar_evento(event)
+                
+            #DESENHA A MENSAGEM DE TUTORIAL
+            self.screen.blit(msg_labhardware, (350, 35))
 
             #DESENHA OU NÃO O POWERUP
             if player.colisao.colliderect(self.colisao_powerup) and not player.desbloqueou_dash :
@@ -908,6 +915,7 @@ class Game:
             self.clock.tick(60)
 
     def Anfiteatro(self, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+        msg_anfiteatro = pygame.transform.scale(pygame.image.load('Assets/Mensagens/tutorial_anfiteatro.png'), (700, 210))
 
         self.sprite_especial_carga1 = pygame.transform.scale(pygame.image.load('Assets/Coletáveis/coletavel_semaforo.png'), (74, 74))
         self.colisao_carga1 = self.sprite_especial_carga1.get_rect(topleft = (900, 600))
@@ -965,6 +973,9 @@ class Game:
                 elif self.estado == 'jogando':
 
                     player.processar_evento(event)
+
+            #DESENHA A MENSAGEM DE TUTORIAL
+            self.screen.blit(msg_anfiteatro, (350, 35))
 
 
             #DESENHA OU NÃO AS CARGAS
@@ -1097,7 +1108,7 @@ class Game:
                             self.paralax = False
 
                             player.vida = 3
-                            player.especial = 3
+                            player.especial = 0
                             player.desbloqueou_pulo_duplo = False
                             player.desbloqueou_dash = False
                             player.vel_x = 0
