@@ -529,9 +529,15 @@ class Game:
                 for ini in lista_inimigos[:]: 
                     ini.atualizar(player, self.plataformas)
 
-                    # Verifica se o soco do player ou acertou este inimigo
+                    # Verifica se o soco do player ou o especial acertou este inimigo
                     if player.hitbox_atq is not None and ini.vida > 0 and ini.invulnerabilidade == 0:
                         if player.hitbox_atq.colliderect(ini.colisao):
+                            ini.vida -= 1
+                            ini.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
+                            ini.tomoudano = True
+                    
+                    if player.hitbox_atq_especial is not None and ini.vida > 0 and ini.invulnerabilidade == 0:
+                        if player.hitbox_atq_especial.colliderect(ini.colisao):
                             ini.vida -= 1
                             ini.invulnerabilidade = cst.INVULNERAVEL_INIMIGO
                             ini.tomoudano = True
@@ -1091,7 +1097,7 @@ class Game:
                             self.paralax = False
 
                             player.vida = 3
-                            player.especial = 0
+                            player.especial = 3
                             player.desbloqueou_pulo_duplo = False
                             player.desbloqueou_dash = False
                             player.vel_x = 0

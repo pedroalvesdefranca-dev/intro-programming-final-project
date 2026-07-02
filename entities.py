@@ -31,6 +31,10 @@ class Player(Entidade):
         self.contagem_moeda = 0
 
         self.hitbox_atq = None
+        self.hitbox_atq_especial = None
+        self.especial_ativo = False
+        self.time_especial = 0
+        self.distancia_especial = 0
 
         self.state = 'idle'
         self.state_antes = None
@@ -56,12 +60,9 @@ class Player(Entidade):
 
         self.pulo = 0
 
-        self.y_anterior = pos[1]
-        
         self.contagem_frames = 0
 
         self.som_dano = pygame.mixer.Sound('Assets/Sons/tomou_dano.wav')
-        self.som_dano.set_volume(0.8)
 
         self.coracao_cheio = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_3-3.png'), (500, 170))
         self.coracao_2_3 = pygame.transform.scale(pygame.image.load('Assets/Personagem/vida_2-3.png'), (500, 170))
@@ -99,6 +100,14 @@ class Player(Entidade):
             pygame.transform.scale(pygame.image.load("Assets/Personagem/atacando.png"), (200, 200))
         ]
         
+        self.ataque_especial = [pygame.transform.scale(pygame.image.load("Assets/Personagem/lançando_especial_1.png"), (200, 200)),
+                                pygame.transform.scale(pygame.image.load("Assets/Personagem/lançando_especial_2.png"), (200, 200)),
+                                pygame.transform.scale(pygame.image.load("Assets/Personagem/lançando_especial_3.png"), (200, 200)),
+                                pygame.transform.scale(pygame.image.load("Assets/Personagem/lançando_especial_4.png"), (200, 200)),
+                                pygame.transform.scale(pygame.image.load("Assets/Personagem/lançando_especial_0.png"), (200, 200))]
+
+        self.projetil_especial = pygame.transform.rotozoom(pygame.image.load("Assets/Personagem/projetil_c_barrado.png"), 0, 1.5)
+
         self.animacao = self.idle
         self.state = 'idle'
 
@@ -127,6 +136,14 @@ class Player(Entidade):
                 self.cooldown_atq = cst.COOLDOWN_ATQ
                 self.vel_x = 0
 
+            #EVENTO ATAQUE ESPECIAL
+            if event.key == pygame.K_i and self.state != 'dash' and self.especial >= 3:
+                self.time_especial = cst.TEMPO_ESPECIAL
+                self.soltar_especial()
+                self.state_antes_especial = self.state
+                self.vel_x = 0
+                self.state = 'especial'
+
     def atualizar_animacao(self):
 
         if self.cooldown_atq > 0:
@@ -140,11 +157,11 @@ class Player(Entidade):
             self.state = self.state_antes
 
         #Atualizando os estados para mudar a animação
-        if self.vel_y != 0 and self.state != 'pulo duplo' and self.state != 'dash' and self.state != 'atacando':
+        if self.vel_y != 0 and self.state != 'pulo duplo' and self.state != 'dash' and self.state != 'atacando' and self.state != 'especial':
             self.state = 'pulando'
-        elif self.vel_x != 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando':
+        elif self.vel_x != 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando' and self.state != 'especial':
             self.state = 'andando'
-        elif self.vel_x == 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando':
+        elif self.vel_x == 0 and self.vel_y == 0 and self.state != 'dash' and self.state != 'atacando' and self.state != 'especial' :
             self.state = 'idle'
 
         if self.state != self.state_antes:
@@ -165,6 +182,8 @@ class Player(Entidade):
             self.animacao = self.idle
         elif self.state == 'pulo duplo' and self.desbloqueou_pulo_duplo:
             self.animacao = self.puloduplo
+        elif self.state == 'especial':
+            self.animacao = self.ataque_especial
 
         if self.state != 'pulando':
             self.contagem_frames += 0.2
@@ -187,7 +206,13 @@ class Player(Entidade):
 
         self.vel_x = 0
 
-        if self.state != 'atacando':
+        if self.state == 'especial':
+            if self.time_especial > 0:
+                self.time_especial -= 1
+                if self.time_dash == 0:
+                    self.state = self.state_antes_dash
+
+        if self.state != 'atacando' and self.state != 'especial':
             teclas = pygame.key.get_pressed()
             if teclas[pygame.K_a]:
                 self.vel_x = -cst.VEL_PERSONAGEM
@@ -239,6 +264,28 @@ class Player(Entidade):
             #Empurra a hitbox mais para a esquerda para acompanhar o soco
             self.hitbox_atq = pygame.Rect(self.pos[0] - 125, altura_soco, 125, 64)
 
+    def soltar_especial(self):
+        self.especial_ativo = True
+
+        #O especial vai sair da altura do braço
+        altura_projetil = self.pos[1] - 10
+
+        self.projetil_ativo = True
+
+        #DEFINE A COLISÃO DO ATAQUE PARA A DIREITA
+        if self.andando_direita:
+            self.hitbox_atq_especial = self.projetil_especial.get_rect(topleft = (self.pos[0] + 100, altura_projetil))
+            self.vel_projetil = 3
+
+        #DEFINE A COLISÃO DO ATAQUE PARA A ESQUERDA
+        else:
+            #Empurra a hitbox mais para a esquerda para acompanhar o soco
+            self.hitbox_atq_especial = self.projetil_especial.get_rect(topleft = (self.pos[0] - 125, altura_projetil))
+            self.vel_projetil = -3
+        
+        #Zera a contagem do especial
+        self.especial = 0
+
     def atualizar_vida(self):
         if self.vida == 3:
             self.screen.blit(self.coracao_cheio, (15, 15))
@@ -277,6 +324,17 @@ class Player(Entidade):
         else:
             frame.set_alpha(255)
 
+        #Desenho do projétil do especial
+        if self.especial_ativo:
+            self.screen.blit(self.projetil_especial, self.hitbox_atq_especial)
+            self.hitbox_atq_especial.x += self.vel_projetil
+            self.distancia_especial += self.vel_projetil
+            if abs(self.distancia_especial) >= 700:
+                self.hitbox_atq_especial = None
+                self.especial_ativo = False
+                self.distancia_especial = 0
+
+
         #variável para armazenar a posição onde a imagem será desenhada
         pos_desenho = list(self.pos)
 
@@ -306,48 +364,17 @@ class Player(Entidade):
         cst.VELDASH = self.dash_antes_paralax
         self.pos[0] += empulso
 
+
 class Inimigo_Corpo_a_Corpo(Entidade):
-
     def __init__(self, pos, screen, sprites_vida):
-
         super().__init__(pos)
         self.screen = screen
         self.vida = 3
         self.sprites_vida = sprites_vida
-
-        #DEFINE O SPRITE ATUAL DE MOVIMENTO DO INIMIGO
-        self.sprite_atual = None
-
+        self.colisao = pygame.Rect(self.pos[0], self.pos[1], 160, 170)
         self.colisao = pygame.Rect(self.pos[0], self.pos[1], 160, 170)
         self.invulnerabilidade = 0
         self.y_anterior = self.pos[1]
-
-        #BOOLEANA QUE MANTE O INIMIGO ATACANDO
-        self.atacando = False
-        self.atacando_contador = 20
-        self.atacou = False
-
-        #VARIÁVES QUE PARAM O INIMIGO QUANDO ELE TOMA UM DANO
-        self.tomoudano = False
-        self.cooldown = 100
-
-        #BOOLEANA QUE INVERTE A IMAGEM DO INIMIGO CONFORME A DIREÇÃO DO INIMIGO
-        self.direita = False
-
-        #CONTADOR PARA O SPRITE ANDANDO DO INIMIGO
-        self.contador_inimigo = 0
-
-        #DEFINE OS SPRITES DO INIMIGO ANDANDO
-        self.sprites_andando = [
-            pygame.transform.scale(pygame.image.load("Assets/Inimigo/inimigo-andando00.png"), (160, 170)),
-            pygame.transform.scale(pygame.image.load("Assets/Inimigo/inimigo-andando01.png"), (160, 170)),
-            pygame.transform.scale(pygame.image.load("Assets/Inimigo/inimigo-andando02.png"), (160, 170)),
-            pygame.transform.scale(pygame.image.load("Assets/Inimigo/inimigo-andando03.png"), (160, 170))
-
-        ]
-
-        #DEFINE OS SPRITES DO INIMIGO ATACANDO
-        self.sprite_atacando = pygame.transform.scale(pygame.image.load('Assets/Inimigo/inimigo-atacando.png'), (280, 230))
 
     def atualizar(self, player, plataformas):
         # Se a vida for 0, ele morre e não faz mais nada
@@ -357,32 +384,8 @@ class Inimigo_Corpo_a_Corpo(Entidade):
         #Persegue o jogador no eixo X
         if self.pos[0] < player.pos[0]:
             self.vel_x = cst.VEL_INIMIGO
-            self.direita = True
-
-            #TEMPORIZADOR QUE PARA O INIMIGO QUANDO ELE TOMA DANO
-            if ((self.tomoudano == True) or (self.atacou == True)) and (self.cooldown > 0):
-                self.vel_x = 0
-                self.cooldown -= 10
-
-            else:
-                self.atacou = False
-                self.tomoudano = False
-                self.cooldown = 100
-
         elif self.pos[0] > player.pos[0]:
-            
             self.vel_x = -cst.VEL_INIMIGO
-            self.direita = False
-
-            #TEMPORIZADOR QUE PARA O INIMIGO QUANDO ELE TOMA DANO
-            if ((self.tomoudano == True) or (self.atacou == True)) and (self.cooldown > 0):
-                self.vel_x = 0
-                self.cooldown -= 10
-
-            else:
-                self.atacou = False
-                self.tomoudano = False
-                self.cooldown = 100
 
         # Aplica gravidade para ele não voar
         self.vel_y += cst.GRAVIDADE
@@ -424,56 +427,14 @@ class Inimigo_Corpo_a_Corpo(Entidade):
                 if self != 'player' and self.invulnerabilidade == 0:
                     cst.VEL_INIMIGO = 3
 
-                #SOMA O CONTADOR PARA MUDAR O SPRITE ANDANDO DO INIMIGO
-                self.contador_inimigo += 0.14
-
-                #CONTROLE PARA NÃO TER OUT OF INDEX
-                if (self.contador_inimigo > 3):
-                    self.contador_inimigo = 0
-
-                #DESENHA O SPRITE DO INIMIGO
-                if (self.direita == False):
-                    
-                    #VERIFICA SE O INIMIGO ESTÁ ATACANDO OU NÃO
-                    if (self.atacando == True and self.atacando_contador > 0):
-                        self.sprite_atual = pygame.transform.flip(self.sprite_atacando, True, False)
-                        self.atacando_contador -= 1
-
-                    elif (self.atacando_contador <= 0):
-                        self.atacando_contador = 20
-                        self.atacando = False
-
-                    else:
-                        self.sprite_atual = pygame.transform.flip(self.sprites_andando[int(self.contador_inimigo)], True, False)
-
-                else:
-
-                    #VERIFICA SE O INIMIGO ESTÁ ATACANDO OU NÃO
-                    if (self.atacando == True and self.atacando_contador > 0):
-                        self.sprite_atual = self.sprite_atacando
-                        self.atacando_contador -= 1
-
-                    elif (self.atacando_contador <= 0):
-                        self.atacando_contador = 20
-                        self.atacando = False
-
-                    else:
-                        self.sprite_atual = self.sprites_andando[int(self.contador_inimigo)]
-
-                pos_x = self.pos[0] + (self.colisao.width / 2) - (self.sprite_atual.get_width() / 2)
-                pos_y = self.pos[1] + 13
-
-                if self.atacando == True:
-                    self.screen.blit(self.sprite_atual, (pos_x, pos_y - 20))
-
-                else:
-                    self.screen.blit(self.sprite_atual, (pos_x, pos_y))
+                # Desenha o quadrado vermelho descendo até ao mesmo nível visual do player
+                retangulo_visual = pygame.Rect(self.pos[0], self.pos[1], 160, 180)
+                pygame.draw.rect(self.screen, (255, 0, 0), retangulo_visual)
 
             # Lógica da Barra de Vida Flutuante
             indice_sprite = 3 - self.vida
             if 0 <= indice_sprite <= 2:
                 sprite = self.sprites_vida[indice_sprite]
-
                 # Centraliza a barra acima do inimigo
                 pos_x = self.pos[0] + (self.colisao.width / 2) - (sprite.get_width() / 2)
                 pos_y = self.pos[1] - 60 
