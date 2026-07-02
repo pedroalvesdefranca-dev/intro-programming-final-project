@@ -389,7 +389,7 @@ class Game:
             self.clock.tick(60)
 
     #SALA ONDE OCORRERÁ O CAMINHO ATÉ O BOSS
-    def CorredorInfinito(self, tela_x, vida=3, especial=0, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
+    def CorredorInfinito(self, tela_x, vida=3, especial=3, desbloqueou_pulo_duplo=False, desbloqueou_dash=False):
         self.tela_x = tela_x
 
         #DEFINE O OBJETO DO PLAYER
@@ -529,7 +529,7 @@ class Game:
                 for ini in lista_inimigos[:]: 
                     ini.atualizar(player, self.plataformas)
 
-                    # Verifica se o soco do player acertou este inimigo
+                    # Verifica se o soco do player ou acertou este inimigo
                     if player.hitbox_atq is not None and ini.vida > 0 and ini.invulnerabilidade == 0:
                         if player.hitbox_atq.colliderect(ini.colisao):
                             ini.vida -= 1
