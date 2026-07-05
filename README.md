@@ -2,7 +2,15 @@
 
 # Humberto Ex Slayer
 
-Projeto final da disciplina de Introdução à Programação, desenvolvido utilizando Python e Pygame.
+Projeto final da disciplina de Introdução à Programação, desenvolvido por:
+- **Pedro Alves de França**
+- **Tom Maciel Nogueira**  
+- **Pedro Sabino Pinho Azevedo** 
+- **Gabriel Pereira do Nascimento** 
+- **Gabriel Lira Pinto Jansen** 
+- **José Vinícius Flor Vila Nova**
+  
+utilizando Python e Pygame.
 
 ## Sobre o projeto
 
